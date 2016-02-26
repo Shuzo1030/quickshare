@@ -1,0 +1,46 @@
+<html>
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>てすと/ふぉるだ/<%= @folder.name %></title>
+</head>
+<body>
+    <h2>フォルダ：<%= @folder.name %></h2>
+    <% base_url = request.path_info %>
+    <form action="<%= base_url %>/upload_file" method="post" enctype="multipart/form-data">
+        <span>ファイルのアップロード</span><input type="file" name="file"><br>
+        <input type="submit" value="アップロード">
+    </form><hr> 
+    <ul>
+        <% if @files.length == 0 && @childfolders.length == 0  %>
+            <p>this folder is empty.</p>
+        <% end %>
+        <% @files.each do |file| %>
+            <li>
+                <a href="/<%= file.link %><%= file.filetype %>" target="blank" download="<%= file.name %>"><%= file.name %></a>
+                <form action="<%= base_url %>/files/<%= file.id %>/delete" method="post">
+                    <input type="submit" value="削除">
+                </form>
+            </li>
+        <% end %>
+        <% @childfolders.each do |folder| %>
+            <li>
+                📂<a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a>
+                <form action="<%= base_url %>/<%= folder.id %>/delete" method="post">
+                    <input type="submit" value="削除">
+                </form>
+            </li>
+        <% end %>
+    </ul>
+    <hr>
+    <form action="<%= base_url %>/create_folder" method="post">
+        <span>新規フォルダー</span><br>
+        名前：<input type="text" name="name"><br>
+        <input type="submit" value="作成">
+    </form>
+    <hr>
+    <form action="<%= base_url %>/delete" method="post">
+        <input type="submit" value="フォルダーの削除">
+    </form>
+    <a href="/">トップに戻る</a>
+</body>
+</html>

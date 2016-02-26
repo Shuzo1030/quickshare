@@ -1,0 +1,20 @@
+<html>
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>てすと/あくせす</title>
+</head>
+<body>
+    <% if @errors %>
+        <ul>
+            エラーが発生しました。
+            <%= @errors %>
+        </ul>
+    <% end %>
+    <form action="/access_folder" method="post">
+        <span>フォルダー名</span><input type="text" name="name"><br>
+        <span>パスワード</span><input type="password" name="password"><br>
+        <input type="submit" value="アクセス">
+    </form>
+    <a href="/">トップに戻る</a>
+</body>
+</html>
