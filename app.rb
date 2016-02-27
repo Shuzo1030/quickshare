@@ -1,13 +1,36 @@
 #coding: utf-8
 require 'bundler/setup'
 Bundler.require
+require "rubygems"
 require 'sinatra/reloader' if development?
 require "sinatra/activerecord"
 require "fileutils"
 require "securerandom"
+require "zip"
 require "./models"
 
 enable :sessions
+
+helpers do
+    def first_directory(first,second,third)
+        !(first.empty?) && second.empty? && third.empty?
+    end
+    def second_directory(first,second,third)
+        !((first.empty?) || (second.empty?)) && third.empty?
+    end
+    def third_directory(first,second,third)
+        !((first.empty?) || (second.empty?) || third.empty?)
+    end
+end
+
+before /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?.*/ do |first,second,third|
+    logger.info first
+    logger.info second
+    logger.info third
+    unless session[:folder] == first.to_i
+        redirect "/access"
+    end
+end
 
 get "/" do
     session[:folder] = nil
@@ -60,85 +83,53 @@ post "/access_folder" do
 end
 
 get /folders\/(\d*)\/?(\d*)\/?(\d*)\/?/ do |first,second,third|
-    if session[:folder] == first.to_i
-        if second.empty? && third.empty?
-            VirtualFolder.folder_request(first.to_i)
-            erb :folder
-        elsif params[:captures][2].empty?
-            VirtualFolder.folder_request(second.to_i)
-            erb :folder
-        elsif !(params[:captures][2].empty?)
-            VirtualFolder.folder_request(third.to_i)
-            @folder_limit = true
-            erb :folder
-        else
-            redirect "/folders/#{first}/#{second}#{third}"
-        end
+    if first_directory(first,second,third)
+        VirtualFolder.folder_request(first.to_i)
+        erb :folder
+    elsif second_directory(first,second,third)
+        VirtualFolder.folder_request(second.to_i)
+        erb :folder
+    elsif third_directory(first,second,third)
+        VirtualFolder.folder_request(third.to_i)
+        @folder_limit = true
+        erb :folder
+    else
+        redirect "/access"
     end
 end
 
 #folder_delete
-post /\/folders\/(\d*)\/?(?:\d*\/)*(\d*)\/delete/ do
-    if params[:captures][1] == ""
-        delete_folder = VirtualFolder.find(params[:captures][0])
-        delete_files = delete_folder.virtual_files
-       delete_files.each do |delete_file|
-            File.unlink("./public/#{delete_file.link}#{delete_file.filetype}")
-        end
-        delete_folder.destroy
+post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/delete/ do |first,second,third|
+    if first_directory(first,second,third)
+        VirtualFolder.folder_delete(first.to_i)
         redirect "/"
-    elsif params[:captures]
-        delete_folder = VirtualFolder.find(params[:captures][1])
-        delete_files = delete_folder.virtual_files
-        delete_files.each do |delete_file|
-            File.unlink("./public/#{delete_file.link}#{delete_file.filetype}")
-        end
-        delete_folder.destroy
-        redirect "/folders/#{params[:captures][0]}"
+    elsif second_directory(first,second,third)
+        VirtualFolder.folder_delete(second.to_i)
+        redirect "/folders/#{first}"
+    elsif third_directory(first,second,third)
+        VirtualFolder.folder_delete(third.to_i)
+        redirect "/folders/#{first}/#{second}"
     else
         redirect back
     end
 end
 
 #file_upload
-post /\/folders\/(?:\d*\/)*(\d*)\/upload_file/ do
-    folder = VirtualFolder.find(params[:captures][0])
-    
-    upload_file = params[:file]
-    unless upload_file
-        redirect back
+post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
+    file = params[:file]
+    if first_directory(first,second,third)
+        VirtualFolder.file_upload(first.to_i,file)
+    elsif second_directory(first,second,third)
+        VirtualFolder.file_upload(second.to_i,file)
+    elsif third_directory(first,second,third)
+        VirtualFolder.file_upload(third.to_i,file)
     end
-    tempfile = upload_file[:tempfile]
-    folder.size += tempfile.size
-    if folder.size <= 1073741824
-        begin
-            file = VirtualFile.create(
-                name: upload_file[:filename],
-                filetype: File.extname(upload_file[:filename]),
-                link: SecureRandom.hex(8).to_s,
-                virtual_folder_id: folder.id
-            )
-        rescue Errno::EEXIST
-            retry
-        end
-        
-        if file.valid?
-            f = open("./public/#{file.link}#{file.filetype}", "w")
-            f.write(tempfile.read)
-            f.close
-        else
-            File.unlink(upload_file)
-        end
-        File.unlink(tempfile)
-    end
-    
     redirect back
 end
 
 #file_delete
-post /\/folders\/(?:\d*\/)*files\/(\d*)\/delete/ do
-    logger.info params[:captures]
-   delete_file = VirtualFile.find(params[:captures][0])
+post /\/folders\/(?:\d*\/)*files\/(\d*)\/delete/ do |file_id|
+   delete_file = VirtualFile.find(file_id.to_i)
    File.unlink("./public/#{delete_file.link}#{delete_file.filetype}")
    delete_file.destroy
    
@@ -146,3 +137,13 @@ post /\/folders\/(?:\d*\/)*files\/(\d*)\/delete/ do
 end
 
 #development_stage
+=begin
+get "/ziptest" do
+    zipfile_name = "./public/testzip.zip"
+    
+    Zip::File.open(zipfile_name,Zip::File::CREATE) do |zipfile|
+        zipfile.add("test.pdf","./public/3AHR最終原稿.pdf")
+    end
+    send_file(zipfile_name)
+end
+=end
