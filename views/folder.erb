@@ -38,6 +38,10 @@
         名前：<input type="text" name="name"><br>
         <input type="submit" value="作成">
     </form>
+    <% else %>
+    <form action="<%= base_url %>/download" method="post">
+        <input type="submit" value="フォルダーのダウンロード">
+    </form>
     <hr>
     <% end %>
         <form action="<%= base_url %>/delete" method="post">

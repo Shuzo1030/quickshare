@@ -12,12 +12,15 @@ class VirtualFile < ActiveRecord::Base
    validates :link, uniqueness: true
 end
 
+class FileManager
+end
+
 def VirtualFolder.folder_request(depth)
       requested_folder = VirtualFolder.find(depth)
       @@folder = requested_folder
       @@childfolders = requested_folder.virtual_folders
       @@files = requested_folder.virtual_files
-   end
+end
    
 def VirtualFolder.folder_delete(delete)
    delete_folder = VirtualFolder.find(delete)
@@ -56,4 +59,17 @@ def VirtualFolder.file_upload(folder,upload_file)
       end
       File.unlink(tempfile)
    end
+end
+
+def FileManager.deleteall(target)
+  if FileTest.directory?(target) then  # ディレクトリかどうかを判別
+    Dir.foreach(target) do |file|    # 中身を一覧
+      next if /^\.+$/ =~ file           # 上位ディレクトリと自身を対象から外す
+      deleteall(target.sub(/\/+$/,"")+"/"+file)
+    end
+    Dir.rmdir(target) rescue ""        # 中身が空になったディレクトリを削除
+  else
+    File.delete(target)                # ディレクトリでなければ削除
+  end
+  p "delete successful"
 end

@@ -30,6 +30,11 @@ before /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?.*/ do |first,second,third|
     unless session[:folder] == first.to_i
         redirect "/access"
     end
+    if $download_done
+        File.unlink("./public/temp.zip")
+        $download_done = false
+        p "delete done"
+    end
 end
 
 get "/" do
@@ -147,3 +152,26 @@ get "/ziptest" do
     send_file(zipfile_name)
 end
 =end
+
+post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
+    if first_directory(first,second,third)
+        
+    elsif second_directory(first,second,third)
+    
+    elsif third_directory(first,second,third)
+        folder = VirtualFolder.find(third.to_i)
+        files = folder.virtual_files
+        zipfile_name = "./public/temp.zip"
+        Zip::File.open(zipfile_name,Zip::File::CREATE) do |zipfile|
+            files.each do |file|
+                zipfile.add("#{file.name}","./public/#{file.link}#{file.filetype}")
+            end
+            
+        end
+    end
+    $download_done = true
+
+    send_file(zipfile_name,filename: folder.name+".zip")
+    redirect "/folders/#{first}/#{second}/#{third}"
+end
+
