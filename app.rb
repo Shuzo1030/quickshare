@@ -26,7 +26,6 @@ post "/create_folder" do
         password_confirmation: params[:password_confirmation]
     )
     if folder.valid?
-        @folder = folder
         session[:folder] = folder.id
         redirect "/folders/#{session[:folder]}"
     else
@@ -53,7 +52,6 @@ end
 post "/access_folder" do
     folder= VirtualFolder.find_by(name: params[:name])
     if folder && folder.authenticate(params[:password])
-        @folder = folder
         session[:folder] = folder.id
         redirect "/folders/#{session[:folder]}"
     else
@@ -61,26 +59,21 @@ post "/access_folder" do
     end
 end
 
-get /\/folders\/(\d*)\/?(?:\d*\/)*(\d*)/ do
-    if params[:captures][1] == ""
-        requested_folder = VirtualFolder.find(params[:captures][0])
-        if session[:folder] == requested_folder.id
-            @folder = VirtualFolder.find(params[:captures][0])
-            @childfolders = VirtualFolder.find(params[:captures][0]).virtual_folders
-            @files = VirtualFolder.find(params[:captures][0]).virtual_files
+get /folders\/(\d*)\/?(\d*)\/?(\d*)\/?/ do |first,second,third|
+    if session[:folder] == first.to_i
+        if second.empty? && third.empty?
+            VirtualFolder.folder_request(first.to_i)
             erb :folder
-        end
-    elsif params[:captures][1]
-        parent_folder = VirtualFolder.find(params[:captures][0])
-        if session[:folder] == parent_folder.id
-            requested_folder = VirtualFolder.find(params[:captures][1])
-            @folder = requested_folder
-            @childfolders = requested_folder.virtual_folders
-            @files = requested_folder.virtual_files
+        elsif params[:captures][2].empty?
+            VirtualFolder.folder_request(second.to_i)
             erb :folder
+        elsif !(params[:captures][2].empty?)
+            VirtualFolder.folder_request(third.to_i)
+            @folder_limit = true
+            erb :folder
+        else
+            redirect "/folders/#{first}/#{second}#{third}"
         end
-    else
-        redirect back
     end
 end
 
