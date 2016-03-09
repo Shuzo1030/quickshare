@@ -1,10 +1,29 @@
 <html>
 <head>
     <meta charset="UTF-8"></meta>
-    <title>てすと/ふぉるだ/<%= @@folder.name %></title>
+    <title>てすと/ふぉるだ/<%= @first.name %><% if @second %>/<%= @second.name %><% end %><% if @third %>/<%= @third.name %><% end %></title>
 </head>
 <body>
-    <h2>フォルダ：<%= @@folder.name %></h2>
+    <% unless @@error.empty? %>
+        <li>
+            <% case @@error
+                when "undefined method `[]' for nil:NilClass" then %>
+                ファイルを選択してください。
+                <% when "Validation failed: Name can't be blank" then %>
+                フォルダー名を設定してください。
+                <% when "folder name already exists" then %>
+                同じ名前のファイルがディレクトリに存在します。別の名前を指定してください。
+                <% else %>
+                <%= @@error %>
+            <% end %>
+        </li>
+        <% @@error = "" %>
+    <% end %>
+    <h2>フォルダー：<a href="/folders/<%= @first.id %>"><%= @first.name %></a>
+    <% if @second %>><a href="/folders/<%= @first.id %>/<%= @second.id %>"><%= @second.name %></a><% end %>
+    <% if @third %>><a href="/folders/<%= @first.id %>/<%= @second.id %>/<%= @third.id %>"><%= @third.name %></a><% end %>
+    (有効期限：<%= @first.expire %>)
+    </h2>
     <% base_url = request.path_info %>
     <form action="<%= base_url %>/upload_file" method="post" enctype="multipart/form-data">
         <span>ファイルのアップロード</span><input type="file" name="file"><br>
@@ -14,18 +33,18 @@
         <% if @@files.length == 0 && @@childfolders.length == 0  %>
             <p>this folder is empty.</p>
         <% end %>
-        <% @@files.each do |file| %>
-            <li>
-                <a href="/<%= file.link %><%= file.filetype %>" target="blank" download="<%= file.name %>"><%= file.name %></a>
-                <form action="<%= base_url %>/files/<%= file.id %>/delete" method="post">
-                    <input type="submit" value="削除">
-                </form>
-            </li>
-        <% end %>
         <% @@childfolders.each do |folder| %>
             <li>
                 📂<a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a>
                 <form action="<%= base_url %>/<%= folder.id %>/delete" method="post">
+                    <input type="submit" value="削除">
+                </form>
+            </li>
+        <% end %>
+        <% @@files.each do |file| %>
+            <li>
+                <a href="/<%= file.link %><%= file.filetype %>" target="blank" download="<%= file.name %>"><%= file.name %></a>
+                <form action="<%= base_url %>/files/<%= file.id %>/delete" method="post">
                     <input type="submit" value="削除">
                 </form>
             </li>
@@ -35,15 +54,16 @@
     <% unless @folder_limit %>
     <form action="<%= base_url %>/create_folder" method="post">
         <span>新規フォルダー</span><br>
-        名前：<input type="text" name="name"><br>
+        名前：<input type="text" name="name" required><br>
         <input type="submit" value="作成">
     </form>
-    <% else %>
+    <hr>
+    <% end %>
     <form action="<%= base_url %>/download" method="post">
         <input type="submit" value="フォルダーのダウンロード">
     </form>
     <hr>
-    <% end %>
+
         <form action="<%= base_url %>/delete" method="post">
             <input type="submit" value="フォルダーの削除">
         </form>

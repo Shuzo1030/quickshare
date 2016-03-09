@@ -4,10 +4,26 @@
     <title>てすと/つくる</title>
 </head>
 <body>
-    <form action="/create_folder" method="post" enctype="multipart/form-data" multiple>
-        <span>フォルダー名</span><input type="text" name="name"><br>
-        <span>パスワード</span><input type="password" name="password"><br>
-        <span>パスワード(確認)</span><input type="password" name="password_confirmation"><br>
+    <% unless @@error.empty? %>
+        <% @@error.each do |e| %>
+            <li>
+                <% case e 
+                    when "Password confirmation doesn't match Password" then %>
+                    確認欄のパスワードが正しいかご確認ください。
+                    <% when "Name has already been taken" then %>
+                    そのファイル名は既に使用されています。別の名前にしてください。
+                    <% else %>
+                    <%= e %>
+                <% end %>
+            </li>
+        <% end %>
+        <% @@error.clear %>
+    <% end %>
+    <form action="/create_folder" method="post">
+        <span>フォルダー名</span><input type="text" name="name" required><br>
+        <span>パスワード</span><input type="password" name="password" required><br>
+        <span>パスワード(確認)</span><input type="password" name="password_confirmation" required><br>
+        <span>有効期間(次の中から選択してください)<input type="date" name="date" min="<%= @today.to_s %>" max="<%= @expire_limit.to_s %>"></span>
         <input type="submit" value="作成">
     </form>
     

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160226100944) do
+ActiveRecord::Schema.define(version: 20160304185653) do
 
   create_table "virtual_files", force: :cascade do |t|
     t.string   "name"
@@ -25,11 +25,13 @@ ActiveRecord::Schema.define(version: 20160226100944) do
   create_table "virtual_folders", force: :cascade do |t|
     t.string   "name"
     t.string   "password"
-    t.string   "password_digest",               null: false
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.string   "password_digest",                   null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.integer  "size",              default: 0
     t.integer  "virtual_folder_id"
+    t.boolean  "parent",            default: false
+    t.date     "expire"
   end
 
 end

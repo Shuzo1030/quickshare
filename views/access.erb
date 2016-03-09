@@ -4,15 +4,22 @@
     <title>てすと/あくせす</title>
 </head>
 <body>
-    <% if @errors %>
-        <ul>
-            エラーが発生しました。
-            <%= @errors %>
-        </ul>
+    <% unless @@error.empty? %>
+        <p>
+            <% case @@error
+                when "not authenticated" then %>
+                フォルダーにアクセスできません。認証を行ってください。
+                <% when "authenticate error" then %>
+                フォルダー名とパスワードをもう一度ご確認ください。
+                <% else %>
+                <%= e %>
+            <% end %>
+        </p>
+        <% @@error = "" %>
     <% end %>
     <form action="/access_folder" method="post">
-        <span>フォルダー名</span><input type="text" name="name"><br>
-        <span>パスワード</span><input type="password" name="password"><br>
+        <span>フォルダー名</span><input type="text" name="name" required><br>
+        <span>パスワード</span><input type="password" name="password" required><br>
         <input type="submit" value="アクセス">
     </form>
     <a href="/">トップに戻る</a>
