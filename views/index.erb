@@ -2,13 +2,38 @@
 <head>
     <meta charset="UTF-8"></meta>
     <title>てすと</title>
+    <link rel="stylesheet" href="/quickshare.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 </head>
 <body>
-    テストダヨ！
-    <ul>
-        <li><a href="/create">フォルダーの作成</a></li>
-        <li><a href="/access">フォルダーへのアクセス</a></li>
-    </ul>
-    <p><a href="/admin">管理者ページ</a></p>
+    <header id="topPageHeader">
+        <div id="logo"><a href="/"></a><img src="/images/logo.png" alt="QuickShare"></div>
+    </header>
+    <div id="topPagecontainer">
+        <div class="linkBox" id="create">
+            <a href="/create" id="linkToCreate" class="topLink">
+                <span>今すぐ共有</span>
+            </a>
+    	<div class="bd">
+        	    <div class="bdT"></div>
+        	    <div class="bdB"></div>
+        	    <div class="bdR"></div>
+        	    <div class="bdL"></div>
+            </div>
+        </div>
+            <div class="linkBox">
+                <a href="/access" id="linkToAccess" class="topLink">
+                    <span>アクセス</span>
+                </a>
+                <div class="bd">
+        		    <div class="bdT"></div>
+        		    <div class="bdB"></div>
+        		    <div class="bdR"></div>
+        		    <div class="bdL"></div>
+                </div>
+            </div>
+        <div id="copyright">©&nbsp;2016&nbsp;&nbsp;Daiki&nbsp;Matsuoka</div>
+    </div>
+    <script src="/quickshare.js"></script>
 </body>
 </html>

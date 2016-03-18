@@ -2,26 +2,58 @@
 <head>
     <meta charset="UTF-8"></meta>
     <title>てすと/あくせす</title>
+    <link rel="stylesheet" href="/quickshare.css">
 </head>
 <body>
-    <% unless @@error.empty? %>
-        <p>
-            <% case @@error
-                when "not authenticated" then %>
-                フォルダーにアクセスできません。認証を行ってください。
-                <% when "authenticate error" then %>
-                フォルダー名とパスワードをもう一度ご確認ください。
-                <% else %>
-                <%= e %>
-            <% end %>
-        </p>
-        <% @@error = "" %>
-    <% end %>
-    <form action="/access_folder" method="post">
-        <span>フォルダー名</span><input type="text" name="name" required><br>
-        <span>パスワード</span><input type="password" name="password" required><br>
-        <input type="submit" value="アクセス">
-    </form>
-    <a href="/">トップに戻る</a>
+    <header id="header">
+        <div id="logo"><a href="/"></a><img src="/images/logo.png" alt="QuickShare"></div>
+        <menu>
+            <ul>
+                <li class="menu1  menu_content"><a href="/how_to"><span>使い方</span></a></li>
+                <li class="barBetween"></li>
+                <li class="menu2  menu_content"><a href="/create"><span>作成</span></a></li>
+                <li class="barBetween"></li>
+                <li id="current" class="menu3  menu_content"><a href="/access"><span>アクセス</span></a></li>
+                <div id="bar"></div>
+            </ul>
+        </menu>
+    </header>
+    <div id="container">
+        <% unless @@error.empty? %>
+            <p>
+                <% case @@error
+                    when "not authenticated" then %>
+                    フォルダーにアクセスできません。認証を行ってください。
+                    <% when "authenticate error" then %>
+                    フォルダー名とパスワードをもう一度ご確認ください。
+                    <% else %>
+                    <%= e %>
+                <% end %>
+            </p>
+            <% @@error = "" %>
+        <% end %>
+    
+        <div id="description">
+            <div id="title" class="accessTitle">
+                <span class="decoAccess"></span><p>共有フォルダーへのアクセス</p><span class="decoAccess"></span>
+            </div>
+            <div id="rules">
+                <ul>
+                    <li>アクセスしたい共有フォルダーの名前とパスワードを入力してください。</li>
+                    <li>セッションの有効期間は3日です。</li>
+                </ul>
+            </div>
+        </div>
+        <form class="form" id="access_form" action="/access_folder" method="post">
+            <div class="formPart"><span>フォルダー名</span><input type="text" name="name" required></div>
+            <div class="formPart"><span>パスワード</span><input type="password" name="password" required></div>
+            <div class="submit" id="access_submit"><button type="submit">アクセス</button></div>
+        </form>
+        
+        <div id="linkToTop"><a href="/">トップに戻る</a></div>
+        <div id="copyright">©&nbsp;2016&nbsp;&nbsp;Daiki&nbsp;Matsuoka</div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="/quickshare.js"></script>
 </body>
 </html>

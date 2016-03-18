@@ -10,7 +10,11 @@ require "zip"
 require "date"
 require "./models"
 
+@@error = ""
+
 enable :sessions
+set :sessions,
+    :expire_after => 259200
 
 helpers do
     def first_directory(first,second,third)
@@ -24,14 +28,7 @@ helpers do
     end
 end
 
-before /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?.*/ do |first,second,third|
-    logger.info first
-    logger.info second
-    logger.info third
-end
-
 get "/" do
-    session[:folder] = nil
     session[:master] = nil
     @@error = ""
     erb :index
@@ -148,23 +145,7 @@ get /folders\/(\d*)\/?(\d*)\/?(\d*)\/?/ do |first,second,third|
         @folder_limit = true
         erb :folder
     else
-        redirect "/access"
-    end
-end
-
-#folder_delete
-post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/delete/ do |first,second,third|
-    if first_directory(first,second,third)
-        VirtualFolder.folder_delete(first.to_i)
-        redirect "/"
-    elsif second_directory(first,second,third)
-        VirtualFolder.folder_delete(second.to_i)
-        redirect "/folders/#{first}"
-    elsif third_directory(first,second,third)
-        VirtualFolder.folder_delete(third.to_i)
-        redirect "/folders/#{first}/#{second}"
-    else
-        redirect back
+       redirect back 
     end
 end
 
@@ -185,21 +166,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
     redirect back
 end
 
-#file_delete
-post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/delete/ do |parent,file_id|
-    delete_file = VirtualFile.find(file_id.to_i)
-    parent_folder = VirtualFolder.find(parent.to_i)
-    
-    filepath = "./public/#{delete_file.link}#{delete_file.filetype}"
-    parent_folder.size -= File.size(filepath)
-    parent_folder.save
-    File.unlink(filepath)
-    delete_file.destroy
-    
-    redirect back
-end
-
-#download as zip
+#download
 post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
     temp = SecureRandom.hex(8).to_s
     zipfile = "/tmp/temp_#{temp}.zip"
@@ -209,7 +176,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
         
         Zip::File.open(zipfile,Zip::File::CREATE) do |zip|
             files.each do |file|
-                zip.add("#{file.name.encode("Shift_JIS")}","./public/#{file.link}#{file.filetype}")
+                zip.add("#{file.name.encode("Shift_JIS")}","./public/uploaded/#{file.link}#{file.filetype}")
             end
             child_folders = folder.virtual_folders
             if child_folders
@@ -217,7 +184,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
                     zip.mkdir("#{child_folder.name.encode("Shift_JIS")}")
                     child_files = child_folder.virtual_files
                     child_files.each do |child_file|
-                        zip.add("#{child_folder.name.encode("Shift_JIS")}/#{child_file.name.encode("Shift_JIS")}","./public/#{child_file.link}#{child_file.filetype}")
+                        zip.add("#{child_folder.name.encode("Shift_JIS")}/#{child_file.name.encode("Shift_JIS")}","./public/uploaded/#{child_file.link}#{child_file.filetype}")
                     end
                     grandchild_folders = child_folder.virtual_folders
                     if grandchild_folders
@@ -225,7 +192,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
                             zip.mkdir("#{child_folder.name.encode("Shift_JIS")}/#{grandchild_folder.name.encode("Shift_JIS")}")
                             grandchild_files = grandchild_folder.virtual_files
                             grandchild_files.each do |grandchild_file|
-                                zip.add("#{child_folder.name.encode("Shift_JIS")}/#{grandchild_folder.name.encode("Shift_JIS")}/#{grandchild_file.name.encode("Shift_JIS")}","./public/#{grandchild_file.link}#{grandchild_file.filetype}")
+                                zip.add("#{child_folder.name.encode("Shift_JIS")}/#{grandchild_folder.name.encode("Shift_JIS")}/#{grandchild_file.name.encode("Shift_JIS")}","./public/uploaded/#{grandchild_file.link}#{grandchild_file.filetype}")
                             end
                         end
                     end
@@ -237,7 +204,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
         files = folder.virtual_files
         Zip::File.open(zipfile,Zip::File::CREATE) do |zip|
             files.each do |file|
-                zip.add("#{file.name.encode("Shift_JIS")}","./public/#{file.link}#{file.filetype}")
+                zip.add("#{file.name.encode("Shift_JIS")}","./public/uploaded/#{file.link}#{file.filetype}")
             end
             child_folders = folder.virtual_folders
             if child_folders
@@ -245,7 +212,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
                     zip.mkdir("#{child_folder.name.encode("Shift_JIS")}")
                     child_files = child_folder.virtual_files
                     child_files.each do |child_file|
-                        zip.add("#{child_folder.name.encode("Shift_JIS")}/#{child_file.name.encode("Shift_JIS")}","./public/#{child_file.link}#{child_file.filetype}")
+                        zip.add("#{child_folder.name.encode("Shift_JIS")}/#{child_file.name.encode("Shift_JIS")}","./public/uploaded/#{child_file.link}#{child_file.filetype}")
                     end
                 end
             end
@@ -255,13 +222,20 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
         files = folder.virtual_files
         Zip::File.open(zipfile,Zip::File::CREATE) do |zip|
             files.each do |file|
-                zip.add("#{file.name.encode("Shift_JIS")}","./public/#{file.link}#{file.filetype}")
+                zip.add("#{file.name.encode("Shift_JIS")}","./public/uploaded/#{file.link}#{file.filetype}")
             end
         end
     end
     zipfile_name = folder.name
     send_file(zipfile, :filename => "#{URI.encode(zipfile_name)}.zip")
     redirect "/folders/#{first}/#{second}/#{third}"
+end
+
+post /\/folders\/(?:\d*\/)*files\/(\d*)\/download/ do |file_id|
+   
+   file = VirtualFile.find(file_id.to_i)
+   send_file("./public/uploaded/#{file.link}#{file.filetype}", :filename => "#{URI.encode(file.name)}")
+   redirect back
 end
 
 get "/admin" do
@@ -286,4 +260,43 @@ get "/not_found" do
    erb :not_found 
 end
 
+get "/clean_up" do
+    f = VirtualFolder.where("expire < ?",Date.today)
+    f.each do |f|
+        f.destroy
+    end    
+    redirect "/admin"
+end
 
+get "/how_to" do
+   erb :how_to 
+end
+
+
+post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/delete/ do |first,second,third|
+    if first_directory(first,second,third)
+        VirtualFolder.folder_delete(first.to_i)
+        redirect "/"
+    elsif second_directory(first,second,third)
+        VirtualFolder.folder_delete(second.to_i)
+        redirect "/folders/#{first}"
+    elsif third_directory(first,second,third)
+        VirtualFolder.folder_delete(third.to_i)
+        redirect "/folders/#{first}/#{second}"
+    else
+        redirect back
+    end
+end
+
+post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/delete/ do |parent,file_id|
+    delete_file = VirtualFile.find(file_id.to_i)
+    parent_folder = VirtualFolder.find(parent.to_i)
+    
+    filepath = "./public/uploaded/#{delete_file.link}#{delete_file.filetype}"
+    parent_folder.size -= File.size(filepath)
+    parent_folder.save
+    File.unlink(filepath)
+    delete_file.destroy
+    
+    redirect back
+end

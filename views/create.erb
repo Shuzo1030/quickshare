@@ -2,31 +2,63 @@
 <head>
     <meta charset="UTF-8"></meta>
     <title>てすと/つくる</title>
+    <link rel="stylesheet" href="quickshare.css">
 </head>
 <body>
-    <% unless @@error.empty? %>
-        <% @@error.each do |e| %>
-            <li>
-                <% case e 
-                    when "Password confirmation doesn't match Password" then %>
-                    確認欄のパスワードが正しいかご確認ください。
-                    <% when "Name has already been taken" then %>
-                    そのファイル名は既に使用されています。別の名前にしてください。
-                    <% else %>
-                    <%= e %>
-                <% end %>
-            </li>
+    <header id="header">
+        <div id="logo"><a href="/"></a><img src="/images/logo.png" alt="QuickShare"></div>
+        <menu>
+            <ul>
+                <li class="menu1 menu_content"><a href="/how_to"><span>使い方</span></a></li>
+                <li class="barBetween"></li>
+                <li id="current" class="menu2 menu_content"><a href="/create"><span>作成</span></a></li>
+                <li class="barBetween"></li>
+                <li class="menu3 menu_content"><a href="/access"><span>アクセス</span></a></li>
+                <div id="bar"></div>
+            </ul>
+        </menu>
+    </header>
+    <div id="container">
+        <% unless @@error.empty? %>
+            <% @@error.each do |e| %>
+                <li>
+                    <% case e 
+                        when "Password confirmation doesn't match Password" then %>
+                        確認欄のパスワードが正しいかご確認ください。
+                        <% when "Name has already been taken" then %>
+                        そのファイル名は既に使用されています。別の名前にしてください。
+                        <% else %>
+                        <%= e %>
+                    <% end %>
+                </li>
+            <% end %>
+            <% @@error.clear %>
         <% end %>
-        <% @@error.clear %>
-    <% end %>
-    <form action="/create_folder" method="post">
-        <span>フォルダー名</span><input type="text" name="name" required><br>
-        <span>パスワード</span><input type="password" name="password" required><br>
-        <span>パスワード(確認)</span><input type="password" name="password_confirmation" required><br>
-        <span>有効期間(次の中から選択してください)<input type="date" name="date" min="<%= @today.to_s %>" max="<%= @expire_limit.to_s %>"></span>
-        <input type="submit" value="作成">
-    </form>
-    
-    <a href="/">トップに戻る</a>
+        
+        <div id="description">
+            <div id="title">
+                <span class="decoCreate"></span><p>共有フォルダーの作成</p><span class="decoCreate"></span>
+            </div>
+            <div id="rules">
+                <ul>
+                    <li>既に存在するフォルダー名は使用できません。</li>
+                    <li>パスワードは6文字以上18文字以下で、英数字のみを使用してください。</li>
+                    <li>有効期間は最大で一週間です。</li>
+                </ul>
+            </div>
+        </div>
+        <form class="form" id="create_form" action="/create_folder" method="post">
+            <div class="formPart"><span>フォルダー名</span><input type="text" name="name" required></div>
+            <div class="formPart"><span>パスワード</span><input type="password" name="password" pattern="[a-zA-Z0-9]{6,18}" required></div>
+            <div class="formPart"><span>パスワード(確認)</span><input type="password" name="password_confirmation" required></div>
+            <div class="formPart"><span>有効期間</span><input type="date" name="date" min="<%= @today.to_s %>" max="<%= @expire_limit.to_s %>" required></div>
+            <div class="submit" id="create_submit"><button type="submit">作成</button></div>
+        </form>
+        
+        <div id="linkToTop"><a href="/">トップに戻る</a></div>
+        <div id="copyright">©&nbsp;2016&nbsp;&nbsp;Daiki&nbsp;Matsuoka</div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="/quickshare.js"></script>
 </body>
 </html>

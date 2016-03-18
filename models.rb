@@ -28,7 +28,7 @@ def VirtualFolder.folder_delete(delete)
    delete_folder = VirtualFolder.find(delete)
    delete_files = delete_folder.virtual_files
    delete_files.each do |delete_file|
-      File.unlink("./public/#{delete_file.link}#{delete_file.filetype}")
+      File.unlink("./public/uploaded/#{delete_file.link}#{delete_file.filetype}")
    end
    delete_folder.destroy
 end
@@ -39,13 +39,14 @@ def VirtualFolder.file_upload(folder,upload_file,parent)
    tempfile = upload_file[:tempfile]
    parent_folder.size += tempfile.size
    parent_folder.save
+   
    if parent_folder.size <= 1073741824
       begin
          file = VirtualFile.create(
             name: upload_file[:filename],
-               filetype: File.extname(upload_file[:filename]),
-               link: SecureRandom.hex(8).to_s,
-               virtual_folder_id: folder.id
+            filetype: File.extname(upload_file[:filename]),
+            link: SecureRandom.hex(8).to_s,
+            virtual_folder_id: folder.id
             )
       rescue Errno::EEXIST =>e
          @@error = e.message
@@ -53,7 +54,7 @@ def VirtualFolder.file_upload(folder,upload_file,parent)
       end
         
       if file.valid?
-         f = open("./public/#{file.link}#{file.filetype}", "w")
+         f = open("./public/uploaded/#{file.link}#{file.filetype}", "w")
          f.write(tempfile.read)
          f.close
       else
@@ -63,6 +64,6 @@ def VirtualFolder.file_upload(folder,upload_file,parent)
    else
       parent_folder.size -= tempfile.size
       parent_folder.save
-      @@error == "folder size is too large"
+      @@error == "file size is too large"
    end
 end
