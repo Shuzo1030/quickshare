@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta charset="UTF-8"></meta>
-    <title>てすと/つくる</title>
+    <title>Quickshare｜フォルダーの作成</title>
     <link rel="stylesheet" href="quickshare.css">
 </head>
 <body>
@@ -49,7 +49,7 @@
         </div>
         <form class="form" id="create_form" action="/create_folder" method="post">
             <div class="formPart"><span>フォルダー名</span><input type="text" name="name" required></div>
-            <div class="formPart"><span>パスワード</span><input type="password" name="password" pattern="[a-zA-Z0-9]{6,18}" required></div>
+            <div class="formPart"><span>パスワード</span><input type="password" name="password" pattern="[a-zA-Z0-9]{1,18}" required></div>
             <div class="formPart"><span>パスワード(確認)</span><input type="password" name="password_confirmation" required></div>
             <div class="formPart"><span>有効期間</span><input type="date" name="date" min="<%= @today.to_s %>" max="<%= @expire_limit.to_s %>" required></div>
             <div class="submit" id="create_submit"><button type="submit">作成</button></div>

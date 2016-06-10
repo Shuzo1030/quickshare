@@ -20,7 +20,7 @@ function sendFileToServer(formData){
 function handleFileUpload(files,obj){
    for(var i = 0; i < files.length; i++){
        var fd = new FormData();
-       fd.append("file",files[i]);
+       fd.append("files[]",files[i]);
        
        console.log(files[i].name);
        sendFileToServer(fd);
@@ -33,7 +33,7 @@ $(function(){
    obj.on("dragenter",function(e){
        e.stopPropagation();
        e.preventDefault();
-       $(this).css("background-color","rgba(0,0,0,0.1)");
+        $(this).css("background-color","rgba(0,0,0,0.1)");
    }).on("dragover",function(e) {
        e.stopPropagation();
        e.preventDefault();
@@ -49,6 +49,12 @@ $(function(){
        $(this).css("background-color","mintcream");
    });
    
+    $(".folder").on("dragenter",function(e){
+        e.preventDefault();
+        $("#droppable").css("background-color","mintcream");
+        $(this).css("background-color","rgba(0,0,0,0.3)");
+    });
+   
    $(document).on("dragenter",function(e) {
        e.stopPropagation();
        e.preventDefault();
@@ -58,13 +64,12 @@ $(function(){
    }).on("drop",function(e) {
        e.stopPropagation();
        e.preventDefault();
-       $("#dropzone").css("background-color","#fff");
+       $("#droppable").css("background-color","mintcream");
    });
    
    var current = $("#current");
    var menuUnderBar = $("#bar");
    var left = current.position().left;
-   console.log(left);
    menuUnderBar.css("left",left);
    
    $(".menu_content").on("mouseover",function(){
@@ -80,19 +85,6 @@ $(function(){
    
    var over_flg = false;
    $(".buttons").css("display","none");
-   $(".menu").on("mouseover",function(){
-       $(this).css("background-color","rgba(0,0,0,0.2)");
-   }).on("mouseleave",function(){
-       $(this).css("background-color","mintcream");
-   });
-   
-   $(".content").not(".menu").on("mouseover",function(){
-       if (over_flg == false){
-        $(".menu").css("background-color","rgba(0,0,0,0)");
-       }
-   }).on("mouseleave",function(){
-        $(".menu").css("background-color","mintcream");
-   });
    
    $(".menu span").click(function() { 
     if ($(this).attr('class') == 'selected') {
@@ -103,15 +95,38 @@ $(function(){
       $(this).addClass('selected').next('ul').slideDown(100);
     }    
   });
-    $('.menu span,.buttons').hover(function(){
+    $('.content,.menu span,.buttons').hover(function(){
     over_flg = true;
   }, function(){
     over_flg = false;
-  });  
+  });
+  
+  var menu_open = false;
+  $(".content").on("contextmenu",function(e){
+    e.preventDefault();
+    menu_open = true;
+    var clickLeft = e.pageX - 70;
+    if ($(".menu span",this).attr('class') != 'selected') {
+        console.log("open");
+      $('.menu span').removeClass('selected');
+      $('.buttons').slideUp(100);
+      $("ul",this).css({
+        left: clickLeft,
+        top: 0
+      });
+      $(".menu span",this).addClass('selected').next('ul').slideDown(100);
+    }
+  }).on("click",function(){
+    $('.menu span').removeClass('selected');
+     $('.buttons').slideUp(100);
+     menu_open = false;
+  });
+  
     $('body').click(function() {
     if (over_flg == false) {
       $('.menu span').removeClass('selected');
       $('.buttons').slideUp(100);
+      menu_open = false;
     }
   });
   
@@ -126,11 +141,42 @@ $(function(){
         top: "150px"
     });
     $("#addFolderWindow").slideDown(300);
+    setTimeout(function(){
+        $("input.addFolderInput").focus();
+    },400);
+  });
+  
+  $("#addFileButton").on("click",function(){
+    $("#pageCover").css("display","block");
+    var windowWidth = $("#addFolderWindow").width();
+    var pageWidth = $(document).width();
+    var setLeft = (pageWidth - windowWidth) / 2;
+    
+    $("#addFileWindow").css({
+        left: setLeft,
+        top: "150px"
+    });
+    $("#addFileWindow").slideDown(300);
   });
   
   $("#pageCover").on("click",function(){
-    $("#addFolderWindow").css("display","none");
-    $(this).css("display","none");  
+    $(".window").css("display","none");
+    $(this).css("display","none");
+  });
+  
+  
+  
+  $(".folder").on("dblclick",function(){
+    var href = $("a",this).attr("href");
+    location.href = href;
+  });
+  
+  $("button.delete").on("click",function(e){
+    if(!confirm("本当に削除しますか？")){
+        return false;
+    }else{
+        location.href="/";
+    }
   });
 
 });
