@@ -1,0 +1,7 @@
+# ignore files in public/uploaded
+public/uploaded/*.*
+public/uploaded/*
+!public/uploaded/.keep
+
+# ignore database
+db/*.db
