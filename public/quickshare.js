@@ -31,12 +31,8 @@ function handleFileUpload(files,obj){
 $(function(){
    var obj=$("#droppable");
    obj.on("dragenter",function(e){
-       e.stopPropagation();
-       e.preventDefault();
-        $(this).css("background-color","rgba(0,0,0,0.1)");
+       $(this).css("background-color","rgba(0,0,0,0.1)");
    }).on("dragover",function(e) {
-       e.stopPropagation();
-       e.preventDefault();
        $(this).css("background-color","rgba(0,0,0,0.1)");
    }).on("drop",function(e){
       $(this).css("background-color","mintcream");
@@ -44,17 +40,24 @@ $(function(){
       var files = e.originalEvent.dataTransfer.files;
       handleFileUpload(files,obj);
    }).on("dragleave",function(e){
-       e.stopPropagation();
-       e.preventDefault();
        $(this).css("background-color","mintcream");
    });
    
     $(".folder").on("dragenter",function(e){
-        e.preventDefault();
+        e.stopPropagation();
         $("#droppable").css("background-color","mintcream");
         $(this).css("background-color","rgba(0,0,0,0.3)");
+    }).on("dragover",function(e){
+        e.stopPropagation();
+        $("#droppable").css("background-color","mintcream");
+        $(this).css("background-color","rgba(0,0,0,0.3)");
+    }).on("dragleave",function(e){
+        e.stopPropagation();
+        $(this).css("background-color","rgba(0,0,0,0)");
     });
-   
+    
+    /*多分必要ない*/
+   /*
    $(document).on("dragenter",function(e) {
        e.stopPropagation();
        e.preventDefault();
@@ -65,7 +68,7 @@ $(function(){
        e.stopPropagation();
        e.preventDefault();
        $("#droppable").css("background-color","mintcream");
-   });
+   });*/
    
    var current = $("#current");
    var menuUnderBar = $("#bar");
