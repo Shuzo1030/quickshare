@@ -51,6 +51,7 @@ $(function(){
    
     $(".folder").on("dragenter",function(e){
         e.preventDefault();
+        e.stopPropagation();
         $("#droppable").css("background-color","mintcream");
         $(this).css("background-color","rgba(0,0,0,0.3)");
     });

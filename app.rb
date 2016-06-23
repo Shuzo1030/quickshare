@@ -184,9 +184,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
 
     if duplicate
         @@error = "file name already exists"
-        raise
         erb :folder
-        return
     end
     
     redirect back
@@ -326,3 +324,7 @@ post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/delete/ do |parent,file_id|
     
     redirect back
 end
+
+#developing stage
+
+post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/name_change/ do |parent,file_id|

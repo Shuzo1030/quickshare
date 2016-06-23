@@ -63,13 +63,13 @@
             </div>
             
 
-            <div id="addFileButton">
+            <div id="addFileButton" class="addButton">
                 <img src="/images/file_upload.png">
                 <span class="hover2"></span>
             </div>
             
             <% unless @folder_limit %>
-                <div id="addFolderButton">
+                <div id="addFolderButton" class="addButton">
                     <img src="/images/addFolder.png">
                     <span class="hover2"></span>
                 </div>
@@ -128,7 +128,7 @@
         <div id="addFileWindow" class="window">
             <form action="<%= base_url %>/upload_file" method="post" enctype="multipart/form-data">
                 <p>ファイルの追加</p>
-                <input type="file" name="files[]" value="ファイルを選択" class="addFolderInput" multiple>
+                <input type="file" name="files[]" value="ファイルを選択" class="addFileInput" multiple>
                 <input type="submit" value="共有" class="submit">
             </form>
         </div>
