@@ -415,6 +415,9 @@ menu ul li a span{
 .content:hover{
     background-color: rgba(0,0,0,0.1);
 }
+.folder_hover{
+    background-color: rgba(0,0,0,0.3);
+}
 .content td{
     position: absolute;
     top: 12px;

@@ -31,39 +31,36 @@ function handleFileUpload(files,obj){
 $(function(){
    var obj=$("#droppable");
    obj.on("dragenter",function(e){
-       e.stopPropagation();
-       e.preventDefault();
         $(this).css("background-color","rgba(0,0,0,0.1)");
    }).on("dragover",function(e) {
-       e.stopPropagation();
-       e.preventDefault();
        $(this).css("background-color","rgba(0,0,0,0.1)");
    }).on("drop",function(e){
+       e.stopPropagation();
+       e.preventDefault();
       $(this).css("background-color","mintcream");
-      e.preventDefault();
       var files = e.originalEvent.dataTransfer.files;
       handleFileUpload(files,obj);
    }).on("dragleave",function(e){
-       e.stopPropagation();
-       e.preventDefault();
        $(this).css("background-color","mintcream");
    });
    
     $(".folder").on("dragenter",function(e){
-        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass("folder_hover");
+    }).on("dragover",function(e){
+        e.stopPropagation();
+        $(this).addClass("folder_hover");
+    }).on("dragleave",function(e){
         e.stopPropagation();
         $("#droppable").css("background-color","mintcream");
-        $(this).css("background-color","rgba(0,0,0,0.3)");
+        $(this).removeClass("folder_hover");
     });
    
    $(document).on("dragenter",function(e) {
-       e.stopPropagation();
        e.preventDefault();
    }).on("dragover",function(e) {
-       e.stopPropagation();
        e.preventDefault();
-   }).on("drop",function(e) {
-       e.stopPropagation();
+   }).on("drop",function(e){
        e.preventDefault();
        $("#droppable").css("background-color","mintcream");
    });

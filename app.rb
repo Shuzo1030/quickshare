@@ -326,5 +326,3 @@ post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/delete/ do |parent,file_id|
 end
 
 #developing stage
-
-post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/name_change/ do |parent,file_id|
