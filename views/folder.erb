@@ -80,7 +80,7 @@
                         <p class="dirEmpty">ファイル・フォルダーはありません</p>
                 <% end %>
                 <% @@childfolders.each do |folder| %>
-                <table class="folder content" draggable="true">
+                <table class="folder content" draggable="true" data-id="<%= folder.id %>">
                         <td class="icon"><img src="/images/folder.png"></td>
                         <td class="name"><a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a></td>
                         <td class="menu">

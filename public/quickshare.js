@@ -1,5 +1,10 @@
-function sendFileToServer(formData){
-    var DataURL = location.pathname + "/upload_file";
+function sendFileToServer(formData,folderId){
+    if(folderId){
+     var DataURL = location.pathname + "/" + folderId + "/upload_file";
+    }else{
+      var DataURL = location.pathname + "/upload_file";  
+    }
+    
     $.ajax({
         url: DataURL,
         type: "POST",
@@ -12,21 +17,29 @@ function sendFileToServer(formData){
 		},
         complete: function (data) {
 			$(".loading").addClass("hide");
-            location.reload();
+			if(folderId){
+			    window.location.href = location.pathname + "/" + folderId;
+			}else{
+                location.reload();
+			}
         }
     });
 }
-   
+
+
 function handleFileUpload(files,obj){
-   for(var i = 0; i < files.length; i++){
-       var fd = new FormData();
-       fd.append("files[]",files[i]);
-       
-       console.log(files[i].name);
-       sendFileToServer(fd);
-       
-   }
+    for(var i=0; i < files.length; i++){
+        var fd = new FormData();
+        fd.append("files[]",files[i]);
+        if(obj){
+          id = obj.data("id");
+          sendFileToServer(fd,id);  
+        }else{
+          sendFileToServer(fd);
+        }
+    }
 }
+
 
 $(function(){
    var obj=$("#droppable");
@@ -39,21 +52,30 @@ $(function(){
        e.preventDefault();
       $(this).css("background-color","mintcream");
       var files = e.originalEvent.dataTransfer.files;
-      handleFileUpload(files,obj);
+      handleFileUpload(files);
    }).on("dragleave",function(e){
        $(this).css("background-color","mintcream");
    });
    
     $(".folder").on("dragenter",function(e){
+                e.preventDefault();
+
         e.stopPropagation();
         $(this).addClass("folder_hover");
     }).on("dragover",function(e){
+                e.preventDefault();
+
         e.stopPropagation();
         $(this).addClass("folder_hover");
     }).on("dragleave",function(e){
         e.stopPropagation();
         $("#droppable").css("background-color","mintcream");
         $(this).removeClass("folder_hover");
+    }).on("drop",function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var files = e.originalEvent.dataTransfer.files;
+        handleFileUpload(files,$(this));
     });
    
    $(document).on("dragenter",function(e) {
