@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>てすと/ふぉるだ/<%= @first.name %><% if @second %>/<%= @second.name %><% end %><% if @third %>/<%= @third.name %><% end %></title>
+    <title>共有フォルダー｜<%= @first.name %><% if @second %>/<%= @second.name %><% end %><% if @third %>/<%= @third.name %><% end %></title>
     <link rel="stylesheet" href="/quickshare.css">
     <% base_url = request.path_info %>
     
@@ -32,6 +32,8 @@
                     同じ名前のフォルダーがすでに存在しています。別の名前を指定してください。
                     <% when "file size is too large" %>
                     フォルダー容量が制限を超えてしまいます。
+                    <% when "file name already exists" %>
+                    同じ名前のファイルが既に存在しています。
                     <% else %>
                     <%= @@error %>
                 <% end %>
@@ -42,28 +44,35 @@
         <div id="directory">
             <div id="directoryProperty">
                 <div id="folderImg"><img src="/images/folder.png" alt="folder"></div>
-                <div id="bredCrumbs"><a href="/folders/<%= @first.id %>"><%= CGI.escapeHTML(@first.name) %></a>&nbsp;<% if @second %>>&nbsp;<a href="/folders/<%= @first.id %>/<%= @second.id %>"><%= CGI.escapeHTML(@second.name) %></a><% end %>&nbsp;<% if @third %>>&nbsp;<a href="/folders/<%= @first.id %>/<%= @second.id %>/<%= @third.id %>"><%= CGI.escapeHTML(@third.name) %></a><% end %></div>
+                <div id="breadCrumbs"><a href="/folders/<%= @first.id %>"><%= CGI.escapeHTML(@first.name) %></a>&nbsp;<% if @second %><span>></span>&nbsp;<a href="/folders/<%= @first.id %>/<%= @second.id %>"><%= CGI.escapeHTML(@second.name) %></a><% end %>&nbsp;<% if @third %><span>></span>&nbsp;<a href="/folders/<%= @first.id %>/<%= @second.id %>/<%= @third.id %>"><%= CGI.escapeHTML(@third.name) %></a><% end %></div>
                 <div id="download">
                     <img src="/images/download.png">
                     <form action="<%= base_url %>/download" method="post" id="folderDownloadButton">
                         <input type="submit" value="" class="hover">
                     </form>
                 </div>
-                <div id="setting">
-                    <img src="/images/gear.png">
-                    <span class="hover"></span>
+                <div id="setting" class="menu">
+                        <img src="/images/gear.png">
+                        <span class="hover"></span>
+                    <ul class="buttons dirFormButton">
+                        <li><form action="<%= base_url %>/delete" method="post"><button type="submit" class="delete">削除</button></form></li>
+                        <li><form><button>プロパティ</button></form></li>
+                    </ul>
                 </div>
-                <form action="<%= base_url %>/delete" method="post" style="display:none">
-                    <input type="submit" value="フォルダーの削除">
-                </form>
+                
             </div>
             
 
+            <div id="addFileButton" class="addButton">
+                <img src="/images/file_upload.png">
+                <span class="hover2"></span>
+            </div>
+            
             <% unless @folder_limit %>
-                <div id="addFolderButton">
+                <div id="addFolderButton" class="addButton">
                     <img src="/images/addFolder.png">
                     <span class="hover2"></span>
-                </div>    
+                </div>
             <% end %>
 
             <div id="droppable">
@@ -71,14 +80,14 @@
                         <p class="dirEmpty">ファイル・フォルダーはありません</p>
                 <% end %>
                 <% @@childfolders.each do |folder| %>
-                <table class="content folder">
+                <table class="folder content" draggable="true" data-id="<%= folder.id %>">
                         <td class="icon"><img src="/images/folder.png"></td>
                         <td class="name"><a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a></td>
-                        <td calss="margin"></td>
                         <td class="menu">
-                            <span><img src="/images/menu.png" alt="menu"></span>
+                            <span></span>
                             <ul class="buttons folderFormButton">
                                 <li><form action="<%= base_url %>/<%= folder.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
+                                <li><form><button>移動</button></form></li>
                                 <li><form action="<%= base_url %>/<%= folder.id %>/delete" method="post"><button type="submit">削除</button></form></li>
                                 <li><form><button>プロパティ</button></form></li>
                             </ul>
@@ -86,14 +95,23 @@
                 </table>
                 <% end %>
                 <% @@files.each do |file| %>
-                <table class="content file">
-                        <td class="icon"><img src="/images/file.png"></td>
+                <table class="file content" draggable="true">
+                        <td class="icon"><img src="
+                            <% if File.exists?("./public/images/file_icons/#{(file.filetype).delete(".")}.png") %>
+                                /images/file_icons/<%= (file.filetype).delete(".") %>.png
+                            <% else %>
+                                /images/file_icons/others.png
+                            <% end %>
+                        "></td>
                         <td class="name"><%= (file.name).gsub!(/\..*/,"") %></td>
+                        <td class="type"><%= (file.filetype).delete(".").upcase %></td>
+                        <td class="size"><%= File.size("./public/uploaded/#{file.link}#{file.filetype}") %></td>
                         <td class="created_at"><%= (file.created_at+9.hour).to_s.delete!("UTC").gsub(/\-/,"/") %></td>
                         <td class="menu">
-                                <span><img src="/images/menu.png" alt="menu"></span>
+                                <span></span>
                                 <ul class="buttons fileFormButton">
                                     <li><form action="<%= base_url %>/files/<%= file.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
+                                    <li><form><button>移動</button></form></li>
                                     <li><form action="<%= base_url %>/files/<%= file.id %>/delete" method="post"><button type="submit">削除</button></form></li>
                                     <li><form><button>プロパティ</button></form></li>
                                 </ul>
@@ -107,6 +125,13 @@
         
         </div>
         
+        <div id="addFileWindow" class="window">
+            <form action="<%= base_url %>/upload_file" method="post" enctype="multipart/form-data">
+                <p>ファイルの追加</p>
+                <input type="file" name="files[]" value="ファイルを選択" class="addFileInput" multiple>
+                <input type="submit" value="共有" class="submit">
+            </form>
+        </div>
         <div id="addFolderWindow" class="window">
             <form action="<%= base_url %>/create_folder" method="post">
                 <p>フォルダーの作成</p>

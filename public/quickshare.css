@@ -18,10 +18,15 @@ html,body{height: 100%;margin: 0;}
     padding-top: 60px;
     text-align: center;
 }
-
-#topPageHeader #logo{width: 300px; height: 83px; margin: 0 auto; position: relative;}
+#topPageHeader #logo{
+    width: 300px;
+    height: 83px;
+    position: absolute;
+    top: 27.5px;
+    left: calc(50% - 150px);
+}
 #topPageHeader #logo img{width: 100%;}
-#topPageHeader #logo a{width: 100%; height: 83px; position: absolute;}
+
 
 
 .catch:last-of-type{margin-top: 80px;}
@@ -52,7 +57,7 @@ html,body{height: 100%;margin: 0;}
     padding-top: 35.5px;
 }
 .bd div{
-    background-color: #333;
+    background-color: #666;
     position:absolute;
     transition:all 0.3s ease;
 }
@@ -78,8 +83,8 @@ html,body{height: 100%;margin: 0;}
 
 #header #logo{
     width: 250px;
-    top:30px;
-    left:10px;
+    top:32.5px;
+    left:20px;
     position: absolute;
 }
 
@@ -292,24 +297,41 @@ menu ul li a span{
 }
 
 #folderImg{
+    top: 2px;
+    left: 5px;
     width: 40px;
     position: absolute;
 }
 
-#bredCrumbs{
+#breadCrumbs{
     position: absolute;
-    left: 50px;
+    left: 55px;
     font-size: 30px;
 }
-#bredCrumbs a{
+#breadCrumbs a{
     display: inline-block;
     color: #333;
     text-decoration: none;
-    line-height: 30px;
+    height: 40px;
+    max-width: 175px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    box-sizing: content-box;
+    padding: 0 2px 4px;
 }
-#bredCrumbs a:hover{
-    border-bottom: 2px solid #363636;
+
+#breadCrumbs a:hover{
+    background-color: rgba(0,0,0,0.2);
 }
+
+#breadCrumbs span{
+    display: inline-block;
+    color: #333;
+    position: relative;
+    top: -7px;
+}
+
 #folderImg img{
     width: 100%;
 }
@@ -321,20 +343,20 @@ menu ul li a span{
 
 #download img, #setting img, #uploadFileButton img{
     position: absolute;
-    width: 30px;
+    width: 35px;
     top: 2.5px;
     left: 2px;
 }
 .hover,.hover2{
     display: block;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -3px;
+    left: -3px;
     border: none;
     background-color: rgba(255,255,255,0);
 }
-.hover{width: 35px; height: 35px;}
-.hover2{width: 40px; height: 40px;}
+.hover{width: 45px; height: 45px;}
+.hover2{width: 45px; height: 45px;}
 
 .hover:focus{
     outline: none;
@@ -348,17 +370,19 @@ menu ul li a span{
     top: 7px;
     right: 50px;
 }
+.dirFormButton{
+    left: 36px !important;
+}
 
-#addFolderButton{
+.addButton{
+    display: inline-block;
     position: relative;
-    margin: 10px 0 10px;
-    display: block;
-    
+    margin: 10px 5px 10px;
     width: 35px;
     height: 35px;
 }
 
-#addFolderButton img{
+.addButton img{
     top: 2.5px;
     left: 2.5px;
     position: absolute;
@@ -370,7 +394,7 @@ menu ul li a span{
     min-height: 196px;
     position: relative;
     margin-top: 10px;
-    padding: 0;
+    padding-bottom: 24.5px;
     border-left: 1px solid #666;
     border-right: 1px solid #666;
 }
@@ -384,26 +408,35 @@ menu ul li a span{
     position: relative;
     width: 100%;
     height: 50px;
-    padding: 4px 5px 2px;
+    padding: 0;
     cursor: pointer;
     table-layout: fixed;
 }
 .content:hover{
     background-color: rgba(0,0,0,0.1);
 }
-
-.content .icon{
-    top: 10px;
-    width: 25px;
-    position: absolute;
+.folder_hover{
+    background-color: rgba(0,0,0,0.3);
 }
-.content .icon img{width: 100%;}
+.content td{
+    position: absolute;
+    top: 12px;
+    user-select: none; 
+-moz-user-select: none;
+-webkit-user-select: none; 
+-ms-user-select: none; 
+}
+.content .icon{
+    width: 30px;
+    height: 30px;
+    top: 9.5px;
+    left: 10px;
+}
+.content .icon img{width: 100%; height: 100%;}
 .content .name{
     width: 200px;
-    top: 10px;
-    left: 40px;
+    left: 50px;
     padding-left: 5px;
-    position: absolute;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -415,35 +448,27 @@ menu ul li a span{
 .content .name a:hover{
     text-decoration: underline;
 }
+.content .type{
+    left: 300px;
+}
+.content .size{
+    left: 400px;
+}
 .content .created_at{
-    position: absolute;
-    padding-left: 15px;
-    top: 10px;
-    left: 250px;
+    left: 500px;
+    width: 200px;
 }
 
-td.menu{
-    position: relative;
-    width: 40px;
-    height: 5px;
-    right: 5px;
-}
+
 td.menu span{
-    position: absolute;
-    top: 2.5px;
-    left: 7.5px;
+    display: none;
 }
-td.menu span img{
-    width: 80%;
-    opacity: 0.8;
-}
+
 .buttons{
     position: absolute;
     display: block;
     width: 100px;
     background-color: #fefefe;
-    top: -17px;
-    left: 43px;
     z-index: 9999;
     border: solid 1px #eee;
     padding: 0;
@@ -479,8 +504,6 @@ td.menu span img{
 
 
 
-
-
 /*window*/
 #pageCover{
     display: none;
@@ -496,39 +519,51 @@ td.menu span img{
     display: none;
     position: absolute;
     border: solid 2px #666;
-    width: 600px;
     z-index: 9999;
     text-align: center;
-}
-
-.addFolderInput{
-    width: 200px;
-    height: 30px;
-    margin-left: 15px;
-    border: 1px solid #aaa;
-    padding-left: 3px;
-    font-size: 17.5px;
-}
-
-.window .submit{
-    margin-top: 40px;
-    border: none;
-    background-color: skyblue;
-    height: 30px;
-    width: 64px;
-    cursor: pointer;
-}
-
-#addFolderWindow{
     width: 400px;
     height: 180px;
     background-color: honeydew;
     border: solid 1px #ccc;
 }
 
+.addFolderInput{
+    width: 200px;
+    height: 30px;
+    margin-top: 5px;
+    margin-left: 15px;
+    border: 1px solid #aaa;
+    padding-left: 3px;
+    font-size: 17.5px;
+}
+.addFileInput{
+    position: absolute;
+    width: 300px;
+    left: 75px;
+    top: 70px;
+    font-size: 15px;
+}
+
+.window .submit{
+    margin-top: 30px;
+    border: none;
+    background-color: skyblue;
+    height: 30px;
+    width: 64px;
+    cursor: pointer;
+}
+#addFileWindow .submit{
+    margin-top: 60px;
+}
+
+.window p{
+    font-size: 20px;
+}
+
 
 .errors{
     margin-left: 20px;
+    color: red;
 }
 
 

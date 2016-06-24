@@ -13,8 +13,6 @@ require "./models"
 @@error = ""
 
 enable :sessions
-set :sessions,
-    :expire_after => 259200
 
 helpers do
     def first_directory(first,second,third)
@@ -151,18 +149,44 @@ end
 
 #file_upload
 post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
+    #raise
+    if first_directory(first,second,third)
+        VirtualFolder.folder_request(first.to_i)
+        @first = @@folder
+    elsif second_directory(first,second,third)
+        VirtualFolder.folder_request(second.to_i)
+        @first = VirtualFolder.find(first.to_i)
+        @second = @@folder
+    elsif third_directory(first,second,third)
+        VirtualFolder.folder_request(third.to_i)
+        @first = VirtualFolder.find(first.to_i)
+        @second = VirtualFolder.find(second.to_i)
+        @third = @@folder
+        @folder_limit = true
+    else
+       redirect back 
+    end
+    
+    duplicate = false
     begin
-        file = params[:file]
-        if first_directory(first,second,third)
-            VirtualFolder.file_upload(first.to_i,file,first.to_i)
-        elsif second_directory(first,second,third)
-            VirtualFolder.file_upload(second.to_i,file,first.to_i)
-        elsif third_directory(first,second,third)
-            VirtualFolder.file_upload(third.to_i,file,first.to_i)
+        params[:files].each do |file|
+            if first_directory(first,second,third)
+                duplicate = VirtualFolder.file_upload(first.to_i,file,first.to_i)
+            elsif second_directory(first,second,third)
+                duplicate = VirtualFolder.file_upload(second.to_i,file,first.to_i)
+            elsif third_directory(first,second,third)
+                duplicate = VirtualFolder.file_upload(third.to_i,file,first.to_i)
+            end
         end
     rescue => e
         @@error = e.message
     end
+
+    if duplicate
+        @@error = "file name already exists"
+        erb :folder
+    end
+    
     redirect back
 end
 
@@ -300,3 +324,5 @@ post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/delete/ do |parent,file_id|
     
     redirect back
 end
+
+#developing stage

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160304185653) do
+ActiveRecord::Schema.define(version: 20160304115057) do
 
   create_table "virtual_files", force: :cascade do |t|
     t.string   "name"
