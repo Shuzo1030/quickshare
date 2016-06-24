@@ -58,13 +58,10 @@ $(function(){
    });
    
     $(".folder").on("dragenter",function(e){
-                e.preventDefault();
-
         e.stopPropagation();
         $(this).addClass("folder_hover");
     }).on("dragover",function(e){
-                e.preventDefault();
-
+        e.preventDefault();
         e.stopPropagation();
         $(this).addClass("folder_hover");
     }).on("dragleave",function(e){
