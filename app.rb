@@ -326,3 +326,10 @@ post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/delete/ do |parent,file_id|
 end
 
 #developing stage
+post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/move_file/ do |parent,file_id|
+    move_file = VirtualFile.find(file_id)
+    move_file.virtual_folder_id = params[:folder].to_i
+    move_file.save
+    
+    redirect back
+end

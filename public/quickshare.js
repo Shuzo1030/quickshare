@@ -26,13 +26,12 @@ function sendFileToServer(formData,folderId){
     });
 }
 
-
 function handleFileUpload(files,obj){
     for(var i=0; i < files.length; i++){
         var fd = new FormData();
         fd.append("files[]",files[i]);
         if(obj){
-          id = obj.data("id");
+          id = obj.data("folderId");
           sendFileToServer(fd,id);  
         }else{
           sendFileToServer(fd);
@@ -40,8 +39,46 @@ function handleFileUpload(files,obj){
     }
 }
 
+function moveFile(fileId,folderId){
+    
+    var DataURL = location.pathname + "/files/" + fileId + "/move_file";  
+    
+    $.ajax({
+        url: DataURL,
+        type: "POST",
+        contentType: false,
+        processData: false,
+        cache: false,
+        data: folderId,
+        beforeSend:function(){
+			$(".loading").removeClass("hide");
+		},
+        complete: function (data) {
+			$(".loading").addClass("hide");
+			window.location.href = location.pathname + "/" + folderId;
+        }
+    });
+}
+
+function setWindow(obj){
+    $("#pageCover").css("display","block");
+    var windowWidth = obj.width();
+    var pageWidth = $(document).width();
+    var setLeft = (pageWidth - windowWidth) / 2;
+
+    obj.css({
+        left: setLeft,
+        top: "150px"
+    });
+    
+    obj.slideDown(300);
+}
 
 $(function(){
+    
+    jQuery.event.props.push("dataTransfer");
+    
+    
    var obj=$("#droppable");
    obj.on("dragenter",function(e){
         $(this).css("background-color","rgba(0,0,0,0.1)");
@@ -71,9 +108,14 @@ $(function(){
     }).on("drop",function(e){
         e.preventDefault();
         e.stopPropagation();
-        var files = e.originalEvent.dataTransfer.files;
+        var files = e.dataTransfer.files;
         handleFileUpload(files,$(this));
     });
+   
+   $(".file").bind("dragstart",function(e){
+       e.dataTransfer.setData("file_id",$(this).data("fileId"));
+       console.log(e.dataTransfer.getData("fileId"));
+   });
    
    $(document).on("dragenter",function(e) {
        e.preventDefault();
@@ -83,6 +125,9 @@ $(function(){
        e.preventDefault();
        $("#droppable").css("background-color","mintcream");
    });
+   
+   
+   
    
    var current = $("#current");
    var menuUnderBar = $("#bar");
@@ -148,38 +193,29 @@ $(function(){
   });
   
   $("#addFolderButton").on("click",function(){
-    $("#pageCover").css("display","block");
-    var windowWidth = $("#addFolderWindow").width();
-    var pageWidth = $(document).width();
-    var setLeft = (pageWidth - windowWidth) / 2;
-
-    $("#addFolderWindow").css({
-        left: setLeft,
-        top: "150px"
-    });
-    $("#addFolderWindow").slideDown(300);
+    setWindow($("#addFolderWindow"));
     setTimeout(function(){
         $("input.addFolderInput").focus();
     },400);
   });
   
   $("#addFileButton").on("click",function(){
-    $("#pageCover").css("display","block");
-    var windowWidth = $("#addFolderWindow").width();
-    var pageWidth = $(document).width();
-    var setLeft = (pageWidth - windowWidth) / 2;
-    
-    $("#addFileWindow").css({
-        left: setLeft,
-        top: "150px"
-    });
-    $("#addFileWindow").slideDown(300);
+    setWindow($("#addFileWindow"));
+  });
+  
+  $(".moveFileButton").on("click",function(e){
+      e.preventDefault();
+      $("#moveFileWindow form").attr("action",location.pathname + "/files/" + $(this).data("fileId") +"/move_file");
+      setWindow($("#moveFileWindow"));
   });
   
   $("#pageCover").on("click",function(){
     $(".window").css("display","none");
     $(this).css("display","none");
   });
+  
+  
+  
   
   
   

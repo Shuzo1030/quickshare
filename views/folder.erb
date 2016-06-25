@@ -80,7 +80,7 @@
                         <p class="dirEmpty">ファイル・フォルダーはありません</p>
                 <% end %>
                 <% @@childfolders.each do |folder| %>
-                <table class="folder content" draggable="true" data-id="<%= folder.id %>">
+                <table class="folder content" draggable="true" data-folder-id="<%= folder.id %>">
                         <td class="icon"><img src="/images/folder.png"></td>
                         <td class="name"><a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a></td>
                         <td class="menu">
@@ -95,7 +95,7 @@
                 </table>
                 <% end %>
                 <% @@files.each do |file| %>
-                <table class="file content" draggable="true">
+                <table class="file content" draggable="true" data-file-id="<%= file.id %>">
                         <td class="icon"><img src="
                             <% if File.exists?("./public/images/file_icons/#{(file.filetype).delete(".")}.png") %>
                                 /images/file_icons/<%= (file.filetype).delete(".") %>.png
@@ -111,7 +111,7 @@
                                 <span></span>
                                 <ul class="buttons fileFormButton">
                                     <li><form action="<%= base_url %>/files/<%= file.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
-                                    <li><form><button>移動</button></form></li>
+                                    <li><form><button class="moveFileButton" data-file-id="<%= file.id %>">移動</button></form></li>
                                     <li><form action="<%= base_url %>/files/<%= file.id %>/delete" method="post"><button type="submit">削除</button></form></li>
                                     <li><form><button>プロパティ</button></form></li>
                                 </ul>
@@ -137,6 +137,15 @@
                 <p>フォルダーの作成</p>
                 <span>フォルダー名<input type="text" name="name" class="addFolderInput" required></span><br>
                 <input type="submit" value="作成" class="submit">
+            </form>
+        </div>
+        <div id="moveFileWindow" class="window">
+            <p>ファイルの移動</p>
+            <form method="post">
+                <% @@folder.virtual_folders.all.each do |folder| %>
+                    <input name="folder" type="radio" value="<%= folder.id %>"><%= folder.name %>
+                <% end %>
+                <input type="submit" value="移動" class="submit">
             </form>
         </div>
         <!-- #folder -->
