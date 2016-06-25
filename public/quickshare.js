@@ -26,13 +26,12 @@ function sendFileToServer(formData,folderId){
     });
 }
 
-function handleFileUpload(files,obj){
+function handleFileUpload(files,folderId){
     for(var i=0; i < files.length; i++){
         var fd = new FormData();
         fd.append("files[]",files[i]);
-        if(obj){
-          id = obj.data("folderId");
-          sendFileToServer(fd,id);  
+        if(folderId){
+          sendFileToServer(fd,folderId);  
         }else{
           sendFileToServer(fd);
         }
@@ -41,7 +40,9 @@ function handleFileUpload(files,obj){
 
 function moveFile(fileId,folderId){
     
-    var DataURL = location.pathname + "/files/" + fileId + "/move_file";  
+    var DataURL = location.pathname + "/files/" + fileId + "/move_file"; 
+    var fd = new FormData();
+    fd.append("folder",folderId);
     
     $.ajax({
         url: DataURL,
@@ -49,11 +50,11 @@ function moveFile(fileId,folderId){
         contentType: false,
         processData: false,
         cache: false,
-        data: folderId,
+        data: fd,
         beforeSend:function(){
 			$(".loading").removeClass("hide");
 		},
-        complete: function (data) {
+        complete: function(data){
 			$(".loading").addClass("hide");
 			window.location.href = location.pathname + "/" + folderId;
         }
@@ -108,13 +109,15 @@ $(function(){
     }).on("drop",function(e){
         e.preventDefault();
         e.stopPropagation();
+        if(e.dataTransfer.getData("file_id")){
+            moveFile(e.dataTransfer.getData("file_id"),$(this).data("folderId"));
+        }
         var files = e.dataTransfer.files;
-        handleFileUpload(files,$(this));
+        handleFileUpload(files,$(this).data("folderId"));
     });
    
    $(".file").bind("dragstart",function(e){
        e.dataTransfer.setData("file_id",$(this).data("fileId"));
-       console.log(e.dataTransfer.getData("fileId"));
    });
    
    $(document).on("dragenter",function(e) {
