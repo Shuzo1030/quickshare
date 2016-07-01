@@ -80,6 +80,16 @@ $(function(){
     jQuery.event.props.push("dataTransfer");
     
     
+    $("#submit").on("click",function(){
+        var num = $("#form").val();
+        var i,sum = 0;
+        for(i=1;i<=num;i++){
+            sum += Math.pow(94,i);
+        }
+        alert(sum);
+    });
+
+    
    var obj=$("#droppable");
    obj.on("dragenter",function(e){
         $(this).css("background-color","rgba(0,0,0,0.1)");
@@ -116,7 +126,13 @@ $(function(){
         handleFileUpload(files,$(this).data("folderId"));
     });
    
-   $(".file").bind("dragstart",function(e){
+   var dragimage = new Image();
+   dragimage.src = "/images/file_cursor.png";
+   dragimage.style = "width:32px;";
+   console.log(dragimage);
+
+   $(".file").on("dragstart",function(e){
+       e.dataTransfer.setDragImage(dragimage,-15,-15);
        e.dataTransfer.setData("file_id",$(this).data("fileId"));
    });
    
@@ -234,5 +250,8 @@ $(function(){
         location.href="/";
     }
   });
+
+    
+
 
 });

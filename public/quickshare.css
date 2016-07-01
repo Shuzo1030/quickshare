@@ -1,6 +1,6 @@
 @import url(//fonts.googleapis.com/earlyaccess/notosansjapanese.css);
 
-body{font-family: "Noto Sans Japanese", sans-serif;}
+body{font-family: "Noto Sans Japanese", sans-serif; font-weight:300;}
 html,body{height: 100%;margin: 0;}
 
 #topPageHeader{
@@ -305,7 +305,8 @@ menu ul li a span{
 
 #breadCrumbs{
     position: absolute;
-    left: 55px;
+    top: -1px;
+    left: 60px;
     font-size: 30px;
 }
 #breadCrumbs a{
@@ -411,6 +412,7 @@ menu ul li a span{
     padding: 0;
     cursor: pointer;
     table-layout: fixed;
+    font-weight: 200;
 }
 .content:hover{
     background-color: rgba(0,0,0,0.1);

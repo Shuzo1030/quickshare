@@ -142,7 +142,7 @@
         <div id="moveFileWindow" class="window">
             <p>ファイルの移動</p>
             <form method="post">
-                <% @@folder.virtual_folders.all.each do |folder| %>
+                <% @first.virtual_folders.all.each do |folder| %>
                     <input name="folder" type="radio" value="<%= folder.id %>"><%= folder.name %>
                 <% end %>
                 <input type="submit" value="移動" class="submit">
