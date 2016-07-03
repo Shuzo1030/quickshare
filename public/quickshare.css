@@ -399,6 +399,15 @@ menu ul li a span{
     border-left: 1px solid #666;
     border-right: 1px solid #666;
 }
+
+.bgcolor_default{
+    background-color: mintcream;
+}
+.bgcolor_gray_1{
+    background-color: rgba(0,0,0,0.1);
+}
+
+
 .dirEmpty{
     position: absolute;
     top: -10px;
@@ -417,9 +426,10 @@ menu ul li a span{
 .content:hover{
     background-color: rgba(0,0,0,0.1);
 }
-.folder_hover{
+.bgcolor_gray_3{
     background-color: rgba(0,0,0,0.3);
 }
+
 .content td{
     position: absolute;
     top: 12px;
