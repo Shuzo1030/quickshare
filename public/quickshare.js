@@ -93,6 +93,7 @@ $(function(){
             $(this).removeClass("bgcolor_gray_1");
             var files = e.originalEvent.dataTransfer.files;
             handleFileUpload(files);
+            $(".content").removeClass("bgcolor_gray_1").removeClass("bgcolor_gray_3");
         }
     });
     
@@ -145,12 +146,15 @@ $(function(){
     dragimage_file.src = "/images/file_cursor.png";
     $(".file").on({
         "dragstart": function(e){
-        e.dataTransfer.setDragImage(dragimage_file,-15,-15);
-        e.dataTransfer.setData("file_id",$(this).data("fileId"));
+            e.dataTransfer.setDragImage(dragimage_file,-15,-15);
+            e.dataTransfer.setData("file_id",$(this).data("fileId"));
+            $(".content").not(this).removeClass("bgcolor_gray_1");
+            $(this).toggleClass("bgcolor_gray_1");
         },
         "drop": function(e){
             $("#droppable").removeClass("bgcolor_gray_1");
-            $(".folder").removeClass("bgcolor_gray_3")
+            $(".folder").removeClass("bgcolor_gray_3");
+            $(".file").removeClass("bgcolor_gray_1");
         },
         "click": function(e){
             e.stopPropagation();

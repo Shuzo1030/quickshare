@@ -38,17 +38,6 @@ def VirtualFolder.file_upload(folder,upload_file,parent)
    parent_folder = VirtualFolder.find(parent)
    tempfile = upload_file[:tempfile]
    
-   duplicate = false
-   folder.virtual_files.each do |f|
-      if f.name == upload_file[:filename]
-         duplicate = true
-      end
-   end
-   
-   if duplicate
-      File.unlink(tempfile)
-      return true
-   end
    
    parent_folder.size += tempfile.size
    parent_folder.save

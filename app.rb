@@ -167,7 +167,6 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
        redirect back 
     end
     
-    duplicate = false
     begin
         params[:files].each do |file|
             if first_directory(first,second,third)
@@ -181,13 +180,6 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
     rescue => e
         @@error = e.message
     end
-
-    if duplicate
-        @@error = "file name already exists"
-        erb :folder
-    end
-    
-    redirect back
 end
 
 #download
@@ -330,7 +322,5 @@ post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/move_file/ do |parent,file_id|
     move_file = VirtualFile.find(file_id)
     move_file.virtual_folder_id = params[:folder].to_i
     move_file.save
-    
-    redirect back
 end
 
