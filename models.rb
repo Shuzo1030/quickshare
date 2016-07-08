@@ -3,13 +3,12 @@ ActiveRecord::Base.establish_connection(ENV["DATABASE_URL"]||"sqlite3:db/develop
 class VirtualFolder < ActiveRecord::Base
    has_secure_password
    has_many :virtual_files, dependent: :destroy
-   has_many :virtual_folders, dependent: :destroy
+   
+   has_many :children, dependent: :destroy, class_name: "VirtualFolder", foreign_key: "virtual_folder_id"
+   belongs_to :parent, class_name: "VirtualFolder"
+   
    validates :name, presence: true
    validates :name, uniqueness: true , if: :parent?
-   
-   def parent?
-      parent == true
-   end
 end
 
 class VirtualFile < ActiveRecord::Base
@@ -33,25 +32,23 @@ def VirtualFolder.folder_delete(delete)
    delete_folder.destroy
 end
 
-def VirtualFolder.file_upload(folder,upload_file,parent)
+def VirtualFolder.file_upload(folder_id,file)
    folder = VirtualFolder.find(folder)
-   parent_folder = VirtualFolder.find(parent)
-   tempfile = upload_file[:tempfile]
+   root_folder = VirtualFolder.find(folder.root_id)
+   tempfile = file[:tempfile]
    
+   root_folder.size += tempfile.size
+   root_folder.save
    
-   parent_folder.size += tempfile.size
-   parent_folder.save
-   
-   if parent_folder.size <= 1073741824
+   if root_folder.size <= 1073741824
       begin
          file = VirtualFile.create(
-            name: upload_file[:filename],
-            filetype: File.extname(upload_file[:filename]),
+            name: file[:filename],
+            filetype: File.extname(file[:filename]),
             link: SecureRandom.hex(8).to_s,
             virtual_folder_id: folder.id
             )
-      rescue Errno::EEXIST =>e
-         @@error = e.message
+      rescue Errno::EEXIST
          retry
       end
         
@@ -60,13 +57,13 @@ def VirtualFolder.file_upload(folder,upload_file,parent)
          f.write(tempfile.read)
          f.close
       else
-         File.unlink(upload_file)
+         File.unlink(file)
       end
+      
       File.unlink(tempfile)
    else
-      parent_folder.size -= tempfile.size
-      parent_folder.save
+      root_folder.size -= tempfile.size
+      root_folder.save
       @@error == "file size is too large"
    end
-   return false
 end

@@ -17,7 +17,7 @@ function sendFileToServer(formData,folderId){
     if(folderId){
         var DataURL = location.pathname + "/" + folderId + "/upload_file";
     }else{
-        var DataURL = location.pathname + "/upload_file";  
+        var DataURL = location.pathname + "/upload_file";
     }
     
     $.ajax({

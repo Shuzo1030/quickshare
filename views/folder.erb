@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>共有フォルダー｜<%= @first.name %><% if @second %>/<%= @second.name %><% end %><% if @third %>/<%= @third.name %><% end %></title>
+    <title>共有フォルダー</title>
     <link rel="stylesheet" href="/quickshare.css">
 </head>
 <body>
@@ -43,7 +43,7 @@
         <div id="directory">
             <div id="directoryProperty">
                 <div id="folderImg"><img src="/images/folder.png" alt="folder"></div>
-                <div id="breadCrumbs"><a href="/folders/<%= @first.id %>"><%= CGI.escapeHTML(@first.name) %></a>&nbsp;<% if @second %><span>></span>&nbsp;<a href="/folders/<%= @first.id %>/<%= @second.id %>"><%= CGI.escapeHTML(@second.name) %></a><% end %>&nbsp;<% if @third %><span>></span>&nbsp;<a href="/folders/<%= @first.id %>/<%= @second.id %>/<%= @third.id %>"><%= CGI.escapeHTML(@third.name) %></a><% end %></div>
+                <div id="breadCrumbs"><%= @folder.id  %></div>
                 <div id="download">
                     <img src="/images/download.png">
                     <form action="<%= base_url %>/download" method="post" id="folderDownloadButton">
@@ -67,58 +67,58 @@
                 <span class="hover2"></span>
             </div>
             
-            <% unless @folder_limit %>
-                <div id="addFolderButton" class="addButton">
-                    <img src="/images/addFolder.png">
-                    <span class="hover2"></span>
-                </div>
-            <% end %>
+            <div id="addFolderButton" class="addButton">
+                <img src="/images/addFolder.png">
+                <span class="hover2"></span>
+            </div>
 
             <div id="droppable">
-                <% if @@files.length == 0 && @@childfolders.length == 0  %>
-                        <p class="dirEmpty">ファイル・フォルダーはありません</p>
-                <% end %>
-                <% @@childfolders.each do |folder| %>
-                <table class="folder content" draggable="true" data-folder-id="<%= folder.id %>">
-                        <td class="icon"><img src="/images/folder.png"></td>
-                        <td class="name"><a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a></td>
-                        <td class="menu">
-                            <span></span>
-                            <ul class="buttons folderFormButton">
-                                <li><form action="<%= base_url %>/<%= folder.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
-                                <li><form><button>移動</button></form></li>
-                                <li><form action="<%= base_url %>/<%= folder.id %>/delete" method="post"><button type="submit">削除</button></form></li>
-                                <li><form><button>プロパティ</button></form></li>
-                            </ul>
-                        </td>
-                </table>
-                <% end %>
-                <% @@files.each do |file| %>
-                <table class="file content" draggable="true" data-file-id="<%= file.id %>">
-                        <td class="icon"><img src="
-                            <% if File.exists?("./public/images/file_icons/#{(file.filetype).delete(".")}.png") %>
-                                /images/file_icons/<%= (file.filetype).delete(".") %>.png
-                            <% else %>
-                                /images/file_icons/others.png
-                            <% end %>
-                        "></td>
-                        <td class="name"><%= (file.name).gsub!(/\..*/,"") %></td>
-                        <td class="type"><%= (file.filetype).delete(".").upcase %></td>
-                        <td class="size"><%= File.size("./public/uploaded/#{file.link}#{file.filetype}") %></td>
-                        <td class="created_at"><%= (file.created_at+9.hour).to_s.delete!("UTC").gsub(/\-/,"/") %></td>
-                        <td class="menu">
+                <% if @children == nil && @files == nil %>
+                    <p class="dirEmpty">ファイル・フォルダーはありません</p>
+                <% else %>
+                    <% @children.each do |folder| %>
+                    <table class="folder content" draggable="true" data-folder-id="<%= folder.id %>">
+                            <td class="icon"><img src="/images/folder.png"></td>
+                            <td class="name"><a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a></td>
+                            <td class="menu">
                                 <span></span>
-                                <ul class="buttons fileFormButton">
-                                    <li><form action="<%= base_url %>/files/<%= file.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
-                                    <li><form><button class="moveFileButton" data-file-id="<%= file.id %>">移動</button></form></li>
-                                    <li><form action="<%= base_url %>/files/<%= file.id %>/delete" method="post"><button type="submit">削除</button></form></li>
+                                <ul class="buttons folderFormButton">
+                                    <li><form action="<%= base_url %>/<%= folder.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
+                                    <li><form><button>移動</button></form></li>
+                                    <li><form action="<%= base_url %>/<%= folder.id %>/delete" method="post"><button type="submit">削除</button></form></li>
                                     <li><form><button>プロパティ</button></form></li>
                                 </ul>
-                        </td>
-                </table>
-                <% end %>
+                            </td>
+                    </table>
+                    <% end %>
+                    
+                    <% @files.each do |file| %>
+                    <table class="file content" draggable="true" data-file-id="<%= file.id %>">
+                            <td class="icon"><img src="
+                                <% if File.exists?("./public/images/file_icons/#{(file.filetype).delete(".")}.png") %>
+                                    /images/file_icons/<%= (file.filetype).delete(".") %>.png
+                                <% else %>
+                                    /images/file_icons/others.png
+                                <% end %>
+                            "></td>
+                            <td class="name"><%= (file.name).gsub!(/\..*/,"") %></td>
+                            <td class="type"><%= (file.filetype).delete(".").upcase %></td>
+                            <td class="size"><%= File.size("./public/uploaded/#{file.link}#{file.filetype}") %></td>
+                            <td class="created_at"><%= (file.created_at+9.hour).to_s.delete!("UTC").gsub(/\-/,"/") %></td>
+                            <td class="menu">
+                                    <span></span>
+                                    <ul class="buttons fileFormButton">
+                                        <li><form action="<%= base_url %>/files/<%= file.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
+                                        <li><form><button class="moveFileButton" data-file-id="<%= file.id %>">移動</button></form></li>
+                                        <li><form action="<%= base_url %>/files/<%= file.id %>/delete" method="post"><button type="submit">削除</button></form></li>
+                                        <li><form><button>プロパティ</button></form></li>
+                                    </ul>
+                            </td>
+                    </table>
+                    <% end %>
                 
                 <div class="loading hide"></div>
+                <% end %>
             </div>
             <!-- #droppable -->
         
@@ -141,9 +141,8 @@
         <div id="moveFileWindow" class="window">
             <p>ファイルの移動</p>
             <form method="post">
-                <input name="folder" type="radio" value="<%= @first.id %>" <% if @@folder == @first %>checked<% end %>><%= @first.name %>
-                <% @first.virtual_folders.all.each do |folder| %>
-                    <input name="folder" type="radio" value="<%= folder.id %>" <% if @@folder == folder %>checked<% end %>><%= folder.name %>
+                <% VirtualFolder.find(@folder.root_id).children.each do |folder| %>
+                    <input name="folder" type="radio" value="<%= folder.id %>" <% if @folder == folder %>checked<% end %>><%= folder.name %>
                 <% end %>
                 <input type="submit" value="移動" class="submit">
             </form>

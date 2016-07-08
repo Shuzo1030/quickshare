@@ -44,7 +44,6 @@ post "/create_folder" do
         name: params[:name],
         password: params[:password],
         password_confirmation: params[:password_confirmation],
-        parent: true,
         expire: params[:date]
     )
     e = folder.errors.full_messages
@@ -52,16 +51,28 @@ post "/create_folder" do
         @@error = e
     end
     
-    
     if folder.valid?
+        folder.root_id = folder.id
+        folder.save
         session[:folder] = folder.id
-        redirect "/folders/#{session[:folder]}"
+        redirect "/folders/#{folder.id}"
     else
         redirect "/create"
     end
 end
 
-post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/create_folder/ do |first,second,third|
+post "/folders/:id/create_folder/" do
+    folder_id = params[:id].to_i
+    
+    VirtualFolder.create(
+        name: params[:name],
+        password: "child",
+        password_confirmation: "child",
+        virtual_folder_id: folder_id, #parent
+        root_id: VirtualFolder.find(folder_id).root_id
+    )
+    
+=begin
     if first_directory(first,second,third)
         folder_names = Array.new
         child_folders = VirtualFolder.find(first.to_i).virtual_folders
@@ -95,7 +106,7 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/create_folder/ do |first,second,third|
            @@error = "folder name already exists"
         end
     end
-
+=end
     redirect back
 end
 
@@ -105,7 +116,7 @@ get "/access" do
 end
 
 post "/access_folder" do
-    folder= VirtualFolder.find_by(name: params[:name])
+    folder = VirtualFolder.find_by(name: params[:name])
     if folder && folder.authenticate(params[:password])
         session[:folder] = folder.id
         redirect "/folders/#{session[:folder]}"
@@ -115,70 +126,33 @@ post "/access_folder" do
     end
 end
 
-get /folders\/(\d*)\/?(\d*)\/?(\d*)\/?/ do |first,second,third|
-    begin
-        if VirtualFolder.find(first.to_i).expire < Date.today
-            redirect "/not_found"
-        elsif session[:folder] != first.to_i
-            @@error = "not authenticated"
-            redirect "/access"
-        end
-    rescue
+get "/folders/:id" do
+    folder_id = params[:id].to_i
+    
+    if VirtualFolder.find(folder_id).root_id != session[:folder]
+        p session[:folder]
+        p VirtualFolder.find(folder_id).root_id
+        @@error = "not authenticated"
+        redirect "/access"
+    end
+    
+    @folder = VirtualFolder.find(folder_id) 
+    if @folder.expire < Date.today
         redirect "/not_found"
     end
-    if first_directory(first,second,third)
-        VirtualFolder.folder_request(first.to_i)
-        @first = @@folder
-        erb :folder
-    elsif second_directory(first,second,third)
-        VirtualFolder.folder_request(second.to_i)
-        @first = VirtualFolder.find(first.to_i)
-        @second = @@folder
-        erb :folder
-    elsif third_directory(first,second,third)
-        VirtualFolder.folder_request(third.to_i)
-        @first = VirtualFolder.find(first.to_i)
-        @second = VirtualFolder.find(second.to_i)
-        @third = @@folder
-        @folder_limit = true
-        erb :folder
-    else
-       redirect back 
-    end
+    
+    @files = @folder.virtual_files
+    @children = @folder.children
+    
+    erb :folder
 end
 
 #file_upload
-post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?upload_file/ do |first,second,third|
-    #raise
-    if first_directory(first,second,third)
-        VirtualFolder.folder_request(first.to_i)
-        @first = @@folder
-    elsif second_directory(first,second,third)
-        VirtualFolder.folder_request(second.to_i)
-        @first = VirtualFolder.find(first.to_i)
-        @second = @@folder
-    elsif third_directory(first,second,third)
-        VirtualFolder.folder_request(third.to_i)
-        @first = VirtualFolder.find(first.to_i)
-        @second = VirtualFolder.find(second.to_i)
-        @third = @@folder
-        @folder_limit = true
-    else
-       redirect back 
-    end
+post "/folders/:id/upload_file/" do
+    folder_id = params[:id].to_i
     
-    begin
-        params[:files].each do |file|
-            if first_directory(first,second,third)
-                duplicate = VirtualFolder.file_upload(first.to_i,file,first.to_i)
-            elsif second_directory(first,second,third)
-                duplicate = VirtualFolder.file_upload(second.to_i,file,first.to_i)
-            elsif third_directory(first,second,third)
-                duplicate = VirtualFolder.file_upload(third.to_i,file,first.to_i)
-            end
-        end
-    rescue => e
-        @@error = e.message
+    params[:files].each do |file|
+        VirtualFolder.file_upload(folder_id,file)
     end
 end
 

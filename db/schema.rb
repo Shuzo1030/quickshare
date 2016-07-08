@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160304115057) do
+ActiveRecord::Schema.define(version: 20160708111021) do
 
   create_table "virtual_files", force: :cascade do |t|
     t.string   "name"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20160304115057) do
     t.integer  "virtual_folder_id"
     t.boolean  "parent",            default: false
     t.date     "expire"
+    t.integer  "root_id"
   end
 
 end
