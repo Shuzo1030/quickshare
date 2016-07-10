@@ -10,22 +10,11 @@ require "zip"
 require "date"
 require "./models"
 
-@@error = ""
-
 enable :sessions
 
-helpers do
-    def first_directory(first,second,third)
-        !(first.empty?) && second.empty? && third.empty?
-    end
-    def second_directory(first,second,third)
-        !((first.empty?) || (second.empty?)) && third.empty?
-    end
-    def third_directory(first,second,third)
-        !((first.empty?) || (second.empty?) || third.empty?)
-    end
-end
+@@error = ""
 
+#top page
 get "/" do
     session[:master] = nil
     @@error = ""
@@ -61,52 +50,28 @@ post "/create_folder" do
     end
 end
 
-post "/folders/:id/create_folder/" do
-    folder_id = params[:id].to_i
+post "/folders/:id/create_folder" do
+    folder = VirtualFolder.find(params[:id].to_i)
     
-    VirtualFolder.create(
-        name: params[:name],
-        password: "child",
-        password_confirmation: "child",
-        virtual_folder_id: folder_id, #parent
-        root_id: VirtualFolder.find(folder_id).root_id
-    )
-    
-=begin
-    if first_directory(first,second,third)
-        folder_names = Array.new
-        child_folders = VirtualFolder.find(first.to_i).virtual_folders
-        child_folders.each_with_index do |folder,i|
-            folder_names[i] = folder.name
-        end
-        unless folder_names.include?(params[:name])
-            child_folder = VirtualFolder.create(
-                name: params[:name],
-                password: "child",
-                password_confirmation: "child",
-                virtual_folder_id: first.to_i
-            )
-        else
-            @@error = "folder name already exists"
-        end
-    elsif second_directory(first,second,third)
-        folder_names = Array.new
-        child_folders = VirtualFolder.find(second.to_i).virtual_folders
-        child_folders.each_with_index do |folder,i|
-            folder_names[i] = folder.name
-        end
-        unless folder_names.include?(params[:name])
-            child_folder = VirtualFolder.create(
-                name: params[:name],
-                password: "child",
-                password_confirmation: "child",
-                virtual_folder_id: second.to_i
-            )
-        else
-           @@error = "folder name already exists"
-        end
+    folder_names = Array.new
+    children = folder.children
+    children.each_with_index do |child,i|
+        folder_names[i] = child.name
     end
-=end
+    
+    if folder_names.include?(params[:name])
+        @@error = "folder name already exists"
+    else
+        VirtualFolder.create(
+            name: params[:name],
+            password: "child",
+            password_confirmation: "child",
+            virtual_folder_id: folder.id,
+            expire: folder.expire,
+            root_id: folder.root_id
+        )
+    end
+    
     redirect back
 end
 
@@ -136,7 +101,8 @@ get "/folders/:id" do
         redirect "/access"
     end
     
-    @folder = VirtualFolder.find(folder_id) 
+    @folder = VirtualFolder.find(folder_id)
+    
     if @folder.expire < Date.today
         redirect "/not_found"
     end
@@ -148,12 +114,14 @@ get "/folders/:id" do
 end
 
 #file_upload
-post "/folders/:id/upload_file/" do
+post "/folders/:id/upload_file" do
     folder_id = params[:id].to_i
     
     params[:files].each do |file|
-        VirtualFolder.file_upload(folder_id,file)
+        VirtualFolder.upload_file(folder_id,file)
     end
+    
+    redirect back
 end
 
 #download
@@ -221,60 +189,23 @@ post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/?download/ do |first,second,third|
     redirect "/folders/#{first}/#{second}/#{third}"
 end
 
-post /\/folders\/(?:\d*\/)*files\/(\d*)\/download/ do |file_id|
-   
-   file = VirtualFile.find(file_id.to_i)
+post "/folders/:folder_id/files/:file_id/download" do
+   file = VirtualFile.find(params[:file_id].to_i)
    send_file("./public/uploaded/#{file.link}#{file.filetype}", :filename => "#{URI.encode(file.name)}")
    redirect back
 end
 
-get "/admin" do
-    p session[:master]
-    if session[:master]
-        erb :admin
-    else
-        erb :admin_gate
-    end
-end
-
-post "/admin" do
-    if params[:password] == "qwerty"
-       session[:master] = true
-    else
-        session[:master] = false
-    end
-    redirect back
-end
-
-get "/not_found" do
-   erb :not_found 
-end
-
-get "/clean_up" do
-    f = VirtualFolder.where("expire < ?",Date.today)
-    f.each do |f|
-        f.destroy
-    end    
-    redirect "/admin"
-end
-
-get "/how_to" do
-   erb :how_to 
-end
-
-
-post /\/folders\/(\d*)\/?(\d*)\/?(\d*)\/delete/ do |first,second,third|
-    if first_directory(first,second,third)
-        VirtualFolder.folder_delete(first.to_i)
+#delete
+post "/folders/:id/delete" do
+    folder = VirtualFolder.find(params[:id].to_i)
+    parent = folder.parent
+    root = VirtualFolder.root?(folder)
+    VirtualFolder.folder_delete(folder)
+    
+    if root
         redirect "/"
-    elsif second_directory(first,second,third)
-        VirtualFolder.folder_delete(second.to_i)
-        redirect "/folders/#{first}"
-    elsif third_directory(first,second,third)
-        VirtualFolder.folder_delete(third.to_i)
-        redirect "/folders/#{first}/#{second}"
     else
-        redirect back
+        redirect "/folders/#{parent.id}"
     end
 end
 
@@ -298,3 +229,41 @@ post /\/folders\/(\d*)\/?(?:\d*\/)*files\/(\d*)\/move_file/ do |parent,file_id|
     move_file.save
 end
 
+
+#admin
+get "/admin" do
+    p session[:master]
+    if session[:master]
+        erb :admin
+    else
+        erb :admin_gate
+    end
+end
+
+post "/admin" do
+    if params[:password] == "qwerty"
+       session[:master] = true
+    else
+        session[:master] = false
+    end
+    redirect back
+end
+
+
+get "/clean_up" do
+    f = VirtualFolder.where("expire < ?",Date.today)
+    f.each do |f|
+        f.destroy
+    end    
+    redirect "/admin"
+end
+
+#404
+get "/not_found" do
+   erb :not_found 
+end
+
+#how to
+get "/how_to" do
+   erb :how_to 
+end

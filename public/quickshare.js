@@ -15,7 +15,7 @@ function handleFileUpload(files,folderId){
 function sendFileToServer(formData,folderId){
     
     if(folderId){
-        var DataURL = location.pathname + "/" + folderId + "/upload_file";
+        var DataURL = "/folders/" + folderId + "/upload_file";
     }else{
         var DataURL = location.pathname + "/upload_file";
     }
@@ -59,7 +59,7 @@ function moveFile(fileId,folderId){
 		},
         complete: function(data){
 			$(".loading").addClass("hide");
-			window.location.href = location.pathname + "/" + folderId;
+			window.location.href = "/folders/" + folderId;
         }
     });
 }

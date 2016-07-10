@@ -23,21 +23,20 @@ def VirtualFolder.folder_request(depth)
    @@files = requested_folder.virtual_files
 end
    
-def VirtualFolder.folder_delete(delete)
-   delete_folder = VirtualFolder.find(delete)
-   delete_files = delete_folder.virtual_files
-   delete_files.each do |delete_file|
+def VirtualFolder.folder_delete(folder)
+   files = folder.virtual_files
+   files.each do |delete_file|
       File.unlink("./public/uploaded/#{delete_file.link}#{delete_file.filetype}")
    end
-   delete_folder.destroy
+   folder.destroy
 end
 
-def VirtualFolder.file_upload(folder_id,file)
-   folder = VirtualFolder.find(folder)
+def VirtualFolder.upload_file(folder_id,file)
+   folder = VirtualFolder.find(folder_id)
    root_folder = VirtualFolder.find(folder.root_id)
    tempfile = file[:tempfile]
    
-   root_folder.size += tempfile.size
+   root_folder.size += File.stat(tempfile).size
    root_folder.save
    
    if root_folder.size <= 1073741824
@@ -65,5 +64,13 @@ def VirtualFolder.file_upload(folder_id,file)
       root_folder.size -= tempfile.size
       root_folder.save
       @@error == "file size is too large"
+   end
+end
+
+def VirtualFolder.root?(folder)
+   if folder.id = folder.root_id
+      return true
+   else
+      return false
    end
 end

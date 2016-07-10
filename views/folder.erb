@@ -43,7 +43,7 @@
         <div id="directory">
             <div id="directoryProperty">
                 <div id="folderImg"><img src="/images/folder.png" alt="folder"></div>
-                <div id="breadCrumbs"><%= @folder.id  %></div>
+                <div id="breadCrumbs"><%= @folder.name %></div>
                 <div id="download">
                     <img src="/images/download.png">
                     <form action="<%= base_url %>/download" method="post" id="folderDownloadButton">
@@ -79,13 +79,13 @@
                     <% @children.each do |folder| %>
                     <table class="folder content" draggable="true" data-folder-id="<%= folder.id %>">
                             <td class="icon"><img src="/images/folder.png"></td>
-                            <td class="name"><a href="<%= base_url %>/<%= folder.id %>"><%= folder.name %></a></td>
+                            <td class="name"><a href="/folders/<%= folder.id %>"><%= folder.name %></a></td>
                             <td class="menu">
                                 <span></span>
                                 <ul class="buttons folderFormButton">
-                                    <li><form action="<%= base_url %>/<%= folder.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
+                                    <li><form action="/folders/<%= folder.id %>/download" method="post"><button type="submit">ダウンロード</button></form></li>
                                     <li><form><button>移動</button></form></li>
-                                    <li><form action="<%= base_url %>/<%= folder.id %>/delete" method="post"><button type="submit">削除</button></form></li>
+                                    <li><form action="/folders/<%= folder.id %>/delete" method="post"><button type="submit">削除</button></form></li>
                                     <li><form><button>プロパティ</button></form></li>
                                 </ul>
                             </td>
