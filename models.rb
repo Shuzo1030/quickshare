@@ -9,18 +9,13 @@ class VirtualFolder < ActiveRecord::Base
    
    validates :name, presence: true
    validates :name, uniqueness: true , if: :parent?
+   
+   
 end
 
 class VirtualFile < ActiveRecord::Base
    belongs_to :virtual_folder
    validates :link, uniqueness: true
-end
-
-def VirtualFolder.folder_request(depth)
-   requested_folder = VirtualFolder.find(depth)
-   @@folder = requested_folder
-   @@childfolders = requested_folder.virtual_folders
-   @@files = requested_folder.virtual_files
 end
    
 def VirtualFolder.folder_delete(folder)
@@ -72,5 +67,20 @@ def VirtualFolder.root?(folder)
       return true
    else
       return false
+   end
+end
+
+def VirtualFolder.add_zip(zip,folder,link)
+   files = folder.virtual_files
+   files.each do |file|
+      zip.add("#{link}/#{file.name.encode("Shift_JIS")}","./public/uploaded/#{file.link}#{file.filetype}")
+   end
+   folders = folder.children
+   unless folders.empty?
+      folders.each do |child|
+         link = link + "/#{child.name.encode("Shift_JIS")}"
+         zip.mkdir("#{link}")
+         VirtualFolder.add_zip(zip,child,link)
+      end
    end
 end
