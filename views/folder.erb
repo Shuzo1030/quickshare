@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/quickshare.css">
 </head>
 <body>
-    <% base_url = request.path_info %>
+    <% base_url = "/folders/#{@folder.id}" %>
     <header id="header">
         <div id="logo"><a href="/"></a><img src="/images/logo.png" alt="QuickShare"></div>
         <menu>
@@ -141,8 +141,8 @@
         <div id="moveFileWindow" class="window">
             <p>ファイルの移動</p>
             <form method="post">
-                <% VirtualFolder.find(@folder.root_id).children.each do |folder| %>
-                    <input name="folder" type="radio" value="<%= folder.id %>" <% if @folder == folder %>checked<% end %>><%= folder.name %>
+                <% @children.each do |folder| %>
+                    <input name="folder" type="radio" value="<%= folder.id %>" <% if folder.id == @folder.id %>checked<% end %>><%= folder.name %>
                 <% end %>
                 <input type="submit" value="移動" class="submit">
             </form>

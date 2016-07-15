@@ -109,29 +109,27 @@ get "/folders/:id" do
     
     @files = @folder.virtual_files
     @children = @folder.children
+    @dir = @folder.dir
     
     erb :folder
 end
 
 #file_upload
 post "/folders/:id/upload_file" do
-    folder_id = params[:id].to_i
-    
+    folder = VirtualFolder.find(params[:id].to_i)
     params[:files].each do |file|
-        VirtualFolder.upload_file(folder_id,file)
+        folder.upload(file)
     end
-    
     redirect back
 end
 
 #download
 post "/folders/:id/download" do
     folder = VirtualFolder.find(params[:id].to_i)
-    
     temp = SecureRandom.hex(8).to_s
     zipfile = "/tmp/temp_#{temp}.zip"
     Zip::File.open(zipfile,Zip::File::CREATE) do |zip|
-        VirtualFolder.add_zip(zip,folder,"#{folder.name.encode("Shift_JIS")}")
+        folder.add_zip(zip,"#{folder.name.encode("Shift_JIS")}")
     end
     zipfile_name = folder.name
     send_file(zipfile, :filename => "#{URI.encode(zipfile_name)}.zip")
@@ -149,8 +147,8 @@ end
 post "/folders/:id/delete" do
     folder = VirtualFolder.find(params[:id].to_i)
     parent = folder.parent
-    root = VirtualFolder.root?(folder)
-    VirtualFolder.folder_delete(folder)
+    root = folder.root?
+    folder.delete_folder
     
     if root
         redirect "/"
@@ -174,9 +172,11 @@ end
 
 #developing stage
 post "/folders/:folder_id/files/:file_id/move_file" do
-    file = VirtualFile.find(params[:file_id])
+    file = VirtualFile.find(params[:file_id].to_i)
     file.virtual_folder_id = params[:folder].to_i
     file.save
+    
+    redirect "/folders/#{params[:folder].to_i}"
 end
 
 
