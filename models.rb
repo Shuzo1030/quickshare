@@ -71,16 +71,13 @@ class VirtualFolder < ActiveRecord::Base
       end
    end
    
-   def dir
-      dir = Array.new
-      children = self.children
-      unless children.empty?
-         children.each do |child|
-            child.show_dir(child)
-         end
+   def dir_list(list)
+      if parent.nil?
+         return list
+      else
+         list.push(parent)
+         parent.dir_list(list)
       end
-   
-      return dir
    end
 end
 

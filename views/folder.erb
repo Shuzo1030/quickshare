@@ -43,6 +43,9 @@
         <div id="directory">
             <div id="directoryProperty">
                 <div id="folderImg"><img src="/images/folder.png" alt="folder"></div>
+                <% unless @folder.root? %>
+                    <div id="parentFolder"><a href="/folders/<%= @folder.parent.id %>"><%= @folder.parent.name %></div></a>
+                <% end %>
                 <div id="breadCrumbs"><%= @folder.name %></div>
                 <div id="download">
                     <img src="/images/download.png">
@@ -61,7 +64,6 @@
                 
             </div>
             
-
             <div id="addFileButton" class="addButton">
                 <img src="/images/file_upload.png">
                 <span class="hover2"></span>
@@ -138,15 +140,14 @@
                 <input type="submit" value="作成" class="submit">
             </form>
         </div>
+        <!-- 
         <div id="moveFileWindow" class="window">
             <p>ファイルの移動</p>
             <form method="post">
-                <% @children.each do |folder| %>
-                    <input name="folder" type="radio" value="<%= folder.id %>" <% if folder.id == @folder.id %>checked<% end %>><%= folder.name %>
-                <% end %>
                 <input type="submit" value="移動" class="submit">
             </form>
         </div>
+        -->
         <!-- #folder -->
         <div id="linkToTop"><a href="/">トップに戻る</a></div>
         <div id="copyright">©&nbsp;2016&nbsp;&nbsp;Daiki&nbsp;Matsuoka</div>

@@ -8,6 +8,7 @@ require "fileutils"
 require "securerandom"
 require "zip"
 require "date"
+require "json"
 require "./models"
 
 enable :sessions
@@ -18,6 +19,7 @@ enable :sessions
 get "/" do
     session[:master] = nil
     @@error = ""
+    
     erb :index
 end
 
@@ -109,7 +111,7 @@ get "/folders/:id" do
     
     @files = @folder.virtual_files
     @children = @folder.children
-    @dir = @folder.dir
+    @dir_list = @folder.dir_list([]).reverse!
     
     erb :folder
 end
