@@ -2,36 +2,36 @@
 <head>
     <meta charset="UTF-8"></meta>
     <title>Quickshare</title>
-    <link rel="stylesheet" href="/quickshare.css">
+    <link rel="stylesheet" href="/top_page.css">
+    <link href='https://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 </head>
 <body>
-    <header id="topPageHeader">
-        <div id="logo"><img src="/images/logo.png" alt="QuickShare"></div>
-    </header>
-    <div id="topPagecontainer">
-        <div class="linkBox" id="create">
-            <a href="/create" id="linkToCreate" class="topLink">
-                <span>今すぐ共有</span>
-            </a>
-    	<div class="bd">
-        	    <div class="bdT"></div>
-        	    <div class="bdB"></div>
-        	    <div class="bdR"></div>
-        	    <div class="bdL"></div>
-            </div>
-        </div>
-            <div class="linkBox">
-                <a href="/access" id="linkToAccess" class="topLink">
-                    <span>アクセス</span>
-                </a>
+    <div id="container">
+        <div id="phrase">アカウント不要のファイル共有サービス</div>
+        <div id="logo">Quickshare</div>
+        <div id="topLink">
+            <a href="/create" id="linkToCreate">
+                <span class="top_mod">フォルダーを<span><br>
+                <span class="top_main">作る</span>
                 <div class="bd">
-        		    <div class="bdT"></div>
-        		    <div class="bdB"></div>
-        		    <div class="bdR"></div>
-        		    <div class="bdL"></div>
+                    <div class="bdT_a"></div>
+                    <div class="bdB_a"></div>
                 </div>
-            </div>
+            </a>
+            <a href="/access" id="linkToAccess">
+                <span class="top_mod">フォルダーを<span><br>
+                <span class="top_main">使う</span>
+                <div class="bd">
+                    <div class="bdT_b"></div>
+                    <div class="bdB_b"></div>
+                </div>
+            </a>
+        </div>
+        <div id="how_to">
+            <a href="/how_to">使い方<div class="bdB_1"></div><div class="bdB_2"></div></a>
+        </div>
+        <hr id="hr">
         <div id="copyright">©&nbsp;2016&nbsp;&nbsp;Daiki&nbsp;Matsuoka</div>
     </div>
     <script src="/quickshare.js"></script>

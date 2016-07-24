@@ -1,0 +1,154 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+
+body{font-family: "Noto Sans Japanese", sans-serif; font-weight:300;}
+html,body{height: 100%; margin: 0;}
+
+a{
+    text-decoration: none;
+}
+
+/* common part */
+#container{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    margin: 0 auto;
+    background-color: #fafafa;
+}
+
+#header{
+    width: 100%;
+    margin: 0 auto;
+    background-color: #666;
+    height: 80px;
+}
+
+#header #logo{
+    font-family: 'Poiret One', cursive;
+    font-size: 40px;
+    color: #fafafa;
+    position: absolute;
+    top: 15px;
+    left: 30px;
+}
+
+#header a:hover #logo{
+    color: #ccc;
+}
+
+#title{
+    margin-top: 20px;
+    position: relative;
+    font-size: 70px;
+    font-weight: 200;
+    width: 100%;
+    text-align: center;
+    line-height: 65px;
+}
+#title span{font-size: 30px;}
+
+
+#rules{
+    width: 575px;
+    position: relative;
+    margin-top: -20px;
+    margin-left: calc((100% - 575px)/2);
+    padding: 5px 10px;
+}
+#rules ul{list-style-type: square;}
+
+.form{
+    width: 500px;
+    position: relative;
+    margin: 20px auto;
+    border-left: solid 1px #666;
+    border-right: solid 1px #666;
+    line-height: 70px;
+    padding-bottom: 2px;
+}
+
+.form span{
+    display: inline-block;
+    margin-left: 0;
+    width: 200px;
+    text-align: right;
+}
+
+.form input{
+    display: inline-block;
+    width: 200px;
+    margin-left: 10px;
+    text-align: left;
+    height: 30px;
+    background-color: #fafafa;
+    border: solid 1px #666;
+    font-size: 15px;
+    padding: 0 3px;
+    font-family:  "Noto Sans Japanese", sans-serif !important;
+}
+
+
+.form .submit{
+    width: 200px;
+    position: relative;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.form .submit button{
+    text-decoration: none;
+    height: 36px;
+    cursor: pointer;
+    font-size: 20px;
+    background: none;
+    border: none;
+    font-weight: 200;
+    transition: width .5s ease;
+    font-family:  "Noto Sans Japanese", sans-serif !important;
+}
+
+.bdB_1,.bdB_2{
+    position: absolute;
+    background-color: #000;
+    height: 1px;
+    width: 75px;
+    bottom: -1px;
+    transition: width .5s ease;
+}
+.bdB_1{left: 100px;}
+.bdB_2{right: 100px;}
+
+.form .submit:hover div{
+    width: 0;
+    transition: width .5s ease;
+}
+.form .submit:hover button{
+    background-color: rgba(0,0,0,0.1);
+    transition: width .5s ease;
+}
+
+#linkToTop{
+    width: 100%;
+    text-align: center;
+    margin: 30px auto 0;
+}
+
+#linkToTop a{
+    font-size: 17.5px;
+    text-decoration: none;
+    color: #666;
+}
+
+#linkToTop a:hover{
+    text-decoration: underline;
+    color: #333;
+}
+#copyright{
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+    margin-top: 120px;
+}
+

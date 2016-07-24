@@ -86,7 +86,7 @@ post "/access_folder" do
     folder = VirtualFolder.find_by(name: params[:name])
     if folder && folder.authenticate(params[:password])
         session[:folder] = folder.id
-        redirect "/folders/#{session[:folder]}"
+        redirect "/folders/#{folder.id}"
     else
         @@error = "authenticate error"
         redirect "/access"
@@ -95,20 +95,17 @@ end
 
 get "/folders/:id" do
     folder_id = params[:id].to_i
-    
+    p VirtualFolder.find(folder_id).root_id
+    p session[:folder]
     if VirtualFolder.find(folder_id).root_id != session[:folder]
-        p session[:folder]
-        p VirtualFolder.find(folder_id).root_id
         @@error = "not authenticated"
         redirect "/access"
     end
     
     @folder = VirtualFolder.find(folder_id)
-    
     if @folder.expire < Date.today
         redirect "/not_found"
     end
-    
     @files = @folder.virtual_files
     @children = @folder.children
     @dir_list = @folder.dir_list([]).reverse!

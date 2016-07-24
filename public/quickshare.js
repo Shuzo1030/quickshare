@@ -33,7 +33,7 @@ function sendFileToServer(formData,folderId){
         complete: function (data) {
 			$(".loading").addClass("hide");
 			if(folderId){
-			    window.location.href = location.pathname + "/" + folderId;
+			    window.location.href = "/folders/" + folderId;
 			}else{
                 location.reload();
 			}
@@ -175,7 +175,7 @@ $(function(){
    
     var current = $("#current");
     var menuUnderBar = $("#bar");
-    var left = current.position().left;
+    var left = current.position.left;
     menuUnderBar.css("left",left);
     
     $(".menu_content").on({
@@ -216,7 +216,7 @@ $(function(){
     $(".content").on({
         "contextmenu": function(e){
             e.preventDefault();
-            var clickLeft = e.pageX - 70;
+            var clickLeft = e.pageX - 180;
             if($(".menu span",this).attr('class') != 'selected') {
                 $('.menu span').removeClass('selected');
                 $('.buttons').slideUp(100);
@@ -271,4 +271,20 @@ $(function(){
             location.href="/";
         }
     });
+    
+    
+    
+    //development
+    $("#parentFolder span").click(function(e){
+        e.stopPropagation();
+        $("#parentFolder .buttons").slideToggle(100);
+    });
+    $("#parentFolder button").click(function(e){
+        e.preventDefault();
+        window.location.href = "/folders/" + $(this).data("parentId");
+    });
+    
+    if(!($("#parentFolder").is(":visible"))){
+        $("#directoryProperty").css("margin-top",75);
+    }
 });

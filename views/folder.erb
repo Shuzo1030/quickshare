@@ -1,25 +1,18 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>共有フォルダー</title>
-    <link rel="stylesheet" href="/quickshare.css">
+    <title>フォルダー｜<%= @folder.name %></title>
+    <link href='https://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/folder.css">
 </head>
 <body>
     <% base_url = "/folders/#{@folder.id}" %>
-    <header id="header">
-        <div id="logo"><a href="/"></a><img src="/images/logo.png" alt="QuickShare"></div>
-        <menu>
-            <ul>
-                <li class="menu1 menu_content"><a href="/how_to"><span>使い方</span></a></li>
-                <li class="barBetween"></li>
-                <li class="menu2 menu_content"><a href="/create"><span>作成</span></a></li>
-                <li class="barBetween"></li>
-                <li id="current" class="menu3  menu_content"><a href="/access"><span>アクセス</span></a></li>
-                <div id="bar"></div>
-            </ul>
-        </menu>
-    </header>
     <div id="container">
+        <header id="header">
+            <div id="header">
+                <a href="/"><div id="logo">Quickshare</div></a>
+            </div>
+        </header>
         <% unless @@error.empty? %>
             <li class="errors">
                 <% case @@error
@@ -42,11 +35,20 @@
         
         <div id="directory">
             <div id="directoryProperty">
-                <div id="folderImg"><img src="/images/folder.png" alt="folder"></div>
                 <% unless @folder.root? %>
-                    <div id="parentFolder"><a href="/folders/<%= @folder.parent.id %>"><%= @folder.parent.name %></div></a>
+                    <div id="parentFolder">
+                        <% if @dir_list.length != 1 %>
+                            <span><img src="/images/parents.png"></span>>
+                            <ul class="buttons">
+                                <% @dir_list.each do |parent| %>
+                                <li><form><button data-parent-id="<%= parent.id %>"><%= parent.name %></button></form></li>
+                                <% end %>
+                            </ul>
+                        <% end %>
+                        <a href="/folders/<%= @folder.parent.id %>"><%= @folder.parent.name %></a> >
+                    </div>
                 <% end %>
-                <div id="breadCrumbs"><%= @folder.name %></div>
+                <div id="folderName"><%= @folder.name %></div>
                 <div id="download">
                     <img src="/images/download.png">
                     <form action="<%= base_url %>/download" method="post" id="folderDownloadButton">
@@ -81,7 +83,7 @@
                     <% @children.each do |folder| %>
                     <table class="folder content" draggable="true" data-folder-id="<%= folder.id %>">
                             <td class="icon"><img src="/images/folder.png"></td>
-                            <td class="name"><a href="/folders/<%= folder.id %>"><%= folder.name %></a></td>
+                            <td class="name"><a href="/folders/<%= folder.id %>"><%= CGI.escapeHTML(folder.name) %></a></td>
                             <td class="menu">
                                 <span></span>
                                 <ul class="buttons folderFormButton">

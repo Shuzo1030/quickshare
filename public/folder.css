@@ -1,0 +1,442 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+
+body{font-family: "Noto Sans Japanese", sans-serif; font-weight:300;}
+html,body{height: 100%; margin: 0;}
+
+a{
+    text-decoration: none;
+}
+
+/* common part */
+#container{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    margin: 0 auto;
+    background-color: #fafafa;
+}
+
+#header{
+    width: 100%;
+    margin: 0 auto;
+    background-color: #666;
+    height: 80px;
+}
+
+#header #logo{
+    font-family: 'Poiret One', cursive;
+    font-size: 40px;
+    color: #fafafa;
+    position: absolute;
+    top: 15px;
+    left: 30px;
+}
+
+#header a:hover #logo{
+    color: #ccc;
+}
+
+/*folders*/
+#directory{
+    display: block;
+    position: relative;
+    width: 900px;
+    margin: 60px auto 0;
+}
+
+#directoryProperty{
+    margin-top: 40px;
+    border-bottom: solid 1px #999;
+    position: relative;
+    height: 80px;
+    width: 100%;
+    padding: 0;
+}
+
+#parentFolder{
+    margin-top: -7.5px;
+    height: 30px;
+    display: inline-block;
+    font-size: 20px;
+    position: relative;
+    height: 35px;
+    margin-left: 0;
+    z-index: 9999;
+    color: #333;
+}
+
+#parentFolder a{
+    display: inline-block;
+    text-decoration: none;
+    color: #666;
+    max-width: 200px;
+    position: relative;
+    top: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#parentFolder a:hover{
+    color: #222;
+}
+
+#parentFolder span{
+    display: inline-block;
+    margin-right: 7.5px;
+    top: 6px;
+    position: relative;
+    width: 30px;
+    height: 30px;
+}
+
+#parentFolder span:hover{
+    background-color: rgba(0,0,0,0.2);
+}
+
+#parentFolder span img{
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 2.5px;
+    left: 2.5px;
+}
+
+#parentFolder ul{
+    position: absolute;
+    top: -15px;
+    left: -105px;
+}
+
+#folderName{
+    position: relative;
+    width: 405px;
+    margin: -17.5px auto;
+    font-size: 30px;
+    text-align: center;
+    font-size: 50px;
+    font-weight: 200;
+    line-height: 70px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#folderImg img{
+    width: 100%;
+}
+
+#download{
+    position: absolute;
+    top: 30px;
+    right: 100px;
+}
+
+#download img, #setting img, #uploadFileButton img{
+    position: absolute;
+    width: 35px;
+    top: 2.5px;
+    left: 2px;
+}
+
+.hover,.hover2{
+    display: block;
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    border: none;
+    background-color: rgba(255,255,255,0);
+}
+.hover{width: 45px; height: 45px;}
+.hover2{width: 45px; height: 45px;}
+
+.hover:focus{
+    outline: none;
+}
+.hover:hover,.hover2:hover{
+    background-color: rgba(0,0,0,0.2);
+}
+
+#setting{
+    position: absolute;
+    top: 30px;
+    right: 50px;
+}
+.dirFormButton{
+    left: 36px !important;
+}
+
+.window{
+    font-family: "Noto Sans Japanese", sans-serif;
+}
+
+.addButton{
+    display: inline-block;
+    position: relative;
+    margin: 10px 5px 10px;
+    width: 35px;
+    height: 35px;
+}
+
+.addButton img{
+    top: 2.5px;
+    left: 2.5px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#droppable{
+    min-height: 196px;
+    position: relative;
+    margin-top: 10px;
+    padding-bottom: 24.5px;
+    border-left: 1px solid #666;
+    border-right: 1px solid #666;
+}
+
+.bgcolor_default{
+    background-color: mintcream;
+}
+.bgcolor_gray_1{
+    background-color: rgba(0,0,0,0.1);
+}
+
+
+.dirEmpty{
+    position: absolute;
+    top: -10px;
+    left: 10px;
+}
+.content{
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 50px;
+    padding: 0;
+    cursor: pointer;
+    table-layout: fixed;
+    font-weight: 200;
+}
+.content:hover{
+    background-color: rgba(0,0,0,0.1);
+}
+.bgcolor_gray_3{
+    background-color: rgba(0,0,0,0.3);
+}
+
+.content td{
+    position: absolute;
+    top: 12px;
+    user-select: none; 
+-moz-user-select: none;
+-webkit-user-select: none; 
+-ms-user-select: none; 
+}
+.content .icon{
+    width: 30px;
+    height: 30px;
+    top: 10px;
+    left: 20px;
+}
+.content .icon img{width: 100%; height: 100%;}
+.file.content .icon {left: 19px;}
+.content .name{
+    width: 300px;
+    height: 30px;
+    top: 10px;
+    left: 65px;
+    padding-left: 5px;
+    overflow: hidden;
+    font-size: 20px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.content .name a{
+    text-decoration: none;
+    color: #000;
+}
+.content .name a:hover{
+    border-bottom: solid 1px #333;
+}
+.content .type{
+    right: 320px;
+}
+.content .size{
+    right: 220px;
+}
+.content .created_at{
+    right: -20px;
+    width: 200px;
+}
+
+
+td.menu span{
+    display: none;
+}
+
+.buttons{
+    position: absolute;
+    display: block;
+    width: 100px;
+    background-color: #fefefe;
+    z-index: 9999;
+    border: solid 1px #eee;
+    padding: 0;
+    
+}
+.buttons li{
+    position: relative;
+    width: 100%;
+    list-style: none;
+}
+.buttons li form{
+    margin: 0;
+}
+.buttons li form button{
+    display: block;
+    font-family: "Noto Sans Japanese", sans-serif;
+    width: 100%;
+    height: 40px;
+    background: none;
+    border-style: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.buttons button:focus{
+    outline: none;
+}
+.buttons button:hover{
+    background-color: rgba(0,0,0,0.1);
+}
+.buttons button:first-of-type{
+    border-bottom: 1px solid #eee;
+}
+
+
+
+
+
+
+/*window*/
+#pageCover{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.6);
+    width: 100%;
+    height: 100%;
+}
+
+.window{
+    display: none;
+    position: absolute;
+    border: solid 2px #666;
+    z-index: 9999;
+    text-align: center;
+    width: 400px;
+    height: 180px;
+    background-color: honeydew;
+    border: solid 1px #ccc;
+}
+
+.addFolderInput{
+    width: 200px;
+    height: 30px;
+    margin-top: 5px;
+    margin-left: 15px;
+    border: 1px solid #aaa;
+    padding-left: 3px;
+    font-size: 17.5px;
+}
+.addFileInput{
+    position: absolute;
+    width: 300px;
+    left: 75px;
+    top: 70px;
+    font-size: 15px;
+}
+
+.window .submit{
+    margin-top: 30px;
+    border: none;
+    background-color: skyblue;
+    height: 30px;
+    width: 64px;
+    cursor: pointer;
+}
+#addFileWindow .submit{
+    margin-top: 60px;
+}
+
+.window p{
+    font-size: 20px;
+}
+
+
+.errors{
+    margin-left: 20px;
+    color: red;
+}
+
+
+/*load*/
+.loading{
+  position:absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:rgba(0,0,0,0.3);
+}
+.loading::after{
+  content:"";
+  display:block;
+  position:absolute;
+  left:440px;
+  top:100px;
+  width:32px;
+  height:32px;
+  border-radius:20px;
+  margin-top:-10px;
+  margin-left:-10px;
+  border:4px solid #fefefe;
+  border-right:4px solid rgba(0,0,0,0);
+  animation: rotate 1s infinite linear;
+}
+@keyframes rotate {
+  0%    { transform: rotate(0deg); }
+  100%  { transform: rotate(360deg); }
+}
+.hide{
+    display: none;
+}
+
+
+#linkToTop{
+    width: 100%;
+    text-align: center;
+    margin: 30px auto 0;
+}
+
+#linkToTop a{
+    font-size: 17.5px;
+    text-decoration: none;
+    color: #666;
+}
+
+#linkToTop a:hover{
+    text-decoration: underline;
+    color: #333;
+}
+#copyright{
+    width: 100%;
+    text-align: center;
+    color: #aaa;
+    margin-top: 40px;
+}
+

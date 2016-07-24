@@ -1,26 +1,17 @@
 <html>
 <head>
     <meta charset="UTF-8"></meta>
-    <title>QuickShare｜フォルダーへのアクセス</title>
-    <link rel="stylesheet" href="/quickshare.css">
+    <title>Quickshare｜フォルダーを使う</title>
+    <link href='https://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/form_page.css">
 </head>
 <body>
-    <header id="header">
-        <div id="logo"><a href="/"></a><img src="/images/logo.png" alt="QuickShare"></div>
-        <menu>
-            <ul>
-                <li class="menu1  menu_content"><a href="/how_to"><span>使い方</span></a></li>
-                <li class="barBetween"></li>
-                <li class="menu2  menu_content"><a href="/create"><span>作成</span></a></li>
-                <li class="barBetween"></li>
-                <li id="current" class="menu3  menu_content"><a href="/access"><span>アクセス</span></a></li>
-                <div id="bar"></div>
-            </ul>
-        </menu>
-    </header>
     <div id="container">
+        <div id="header">
+            <a href="/"><div id="logo">Quickshare</div></a>
+        </div>
         <% unless @@error.empty? %>
-            <p>
+            <p id="error">
                 <% case @@error
                     when "not authenticated" then %>
                     フォルダーにアクセスできません。認証を行ってください。
@@ -32,22 +23,18 @@
             </p>
             <% @@error = "" %>
         <% end %>
-    
-        <div id="description">
-            <div id="title" class="accessTitle">
-                <span class="decoAccess"></span><p>共有フォルダーへのアクセス</p><span class="decoAccess"></span>
-            </div>
-            <div id="rules">
-                <ul>
-                    <li>アクセスしたい共有フォルダーの名前とパスワードを入力してください。</li>
-                    <li>セッションの有効期間は3日です。</li>
-                </ul>
-            </div>
-        </div>
+        <h1 id="title">
+            <span>フォルダーを</span><br>使う
+        </h1>
         <form class="form" id="access_form" action="/access_folder" method="post">
-            <div class="formPart"><span>フォルダー名</span><input type="text" name="name" required></div>
-            <div class="formPart"><span>パスワード</span><input type="password" name="password" required></div>
-            <div class="submit" id="access_submit"><button type="submit">アクセス</button></div>
+            <span>フォルダー名：</span>
+            <input type="text" name="name" required><br>
+            <span>パスワード：</span>
+            <input type="password" name="password" required><br>
+            <div class="submit" id="access_submit">
+                <button type="submit">フォームを送信</button>
+                <div class="bdB_1"></div><div class="bdB_2"></div>
+            </div>
         </form>
         
         <div id="linkToTop"><a href="/">トップに戻る</a></div>
