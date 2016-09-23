@@ -25,24 +25,47 @@ function sendFileToServer(formData,folderId){
         type: "POST",
         contentType: false,
         processData: false,
-        cache: false,
+        cache: true,
         data: formData,
+        dataType: "json",
         beforeSend:function(){
 			$(".loading").removeClass("hide");
 		},
-        complete: function (data) {
+        success: function(fileData){
 			$(".loading").addClass("hide");
 			if(folderId){
 			    window.location.href = "/folders/" + folderId;
 			}else{
-                location.reload();
+			    var i,files=fileData.data;
+			    for(i=0;i<files.length;i++){
+			        $("#droppable").append(
+			            $('<ul class="file content added" draggable="true" data-file-id="'+files[i].id+'" style="display:none">')
+			            .append('<li class="icon"><img src="'+
+			                    (files[i].img_existence ? '/images/file_icons/'+files[i].img_filetype+'.png' : '/images/file_icons/others.png')
+			                    +'"></li>')
+			            .append('<li class="name">'+files[i].name+'</li>')
+			            .append('<li class="type">'+files[i].filetype+'</li>')
+			            .append('<li class="size">'+files[i].size+'</li>')
+			            .append('<li class="created_at">'+files[i].created_at+'</li>')
+			            .append($('<li class="menu">')
+			                    .append('<span></span>')
+			                    .append($('<ul class="buttons">')
+			                            .append('<li class="download-file"><a href="'+location.pathname+'/files/'+files[i].id+'/download">ダウンロード</a></li>')
+			                            .append('<li data-file-id="'+files[i].id+'"class="move-file">移動</li>')
+			                            .append('<li data-file-id="'+files[i].id+'"class="delete-file">削除</li>')
+			                            .append('<li>プロパティ</li>')
+			                            )
+			                    )
+			        );
+			    }
+			    $(".buttons").css("display","none");
+			    $(".added").slideDown(500);
 			}
         }
     });
 }
 
 function moveFile(fileId,folderId){
-    
     var DataURL = location.pathname + "/files/" + fileId + "/move_file"; 
     var fd = new FormData();
     fd.append("folder",folderId);
@@ -52,17 +75,85 @@ function moveFile(fileId,folderId){
         type: "POST",
         contentType: false,
         processData: false,
-        cache: false,
+        cache: true,
         data: fd,
         beforeSend:function(){
 			$(".loading").removeClass("hide");
 		},
-        complete: function(data){
+        success: function(data){
 			$(".loading").addClass("hide");
 			window.location.href = "/folders/" + folderId;
         }
     });
 }
+
+
+function deleteFile(fileId){
+    var DataURL = location.pathname + "/files/" + fileId + "/delete"; 
+    var obj = $(".file[data-file-id=" + fileId + "]");
+    obj.slideUp(500,function(){
+        $.ajax({
+            url: DataURL,
+            type: "POST",
+            contentType: false,
+            processData: false,
+            cache: true
+        }).done(function(){
+            obj.remove();
+        });
+    });
+}
+
+function createFolder(folderName){
+    var fd = new FormData();
+    fd.append("name",folderName);
+    
+    $.ajax({
+        url: location.pathname + "/create_folder",
+        type: "post",
+        contentType: false,
+        processData: false,
+        cache: true,
+        data: fd
+    }).done(function(data){
+        
+        $("#folders").append(
+            $('<ul class="folder content added" draggable="true" data-folder-id="'+data.id+'" style="display:none">')
+            .append('<li class="icon"><img src="/images/folder.png"></li>')
+		    .append('<li class="name"><a href="/folders/'+data.id+'">'+data.name+'</a></li>')
+            .append($('<li class="menu">')
+                .append('<span></span>')
+                .append($('<ul class="buttons">')
+                    .append('<li class="download-file"><a href="'+location.pathname+'/folders/'+data.id+'/download">ダウンロード</a></li>')
+                    .append('<li data-file-id="'+data.id+'"class="move-folder">移動</li>')
+                    .append('<li data-file-id="'+data.id+'"class="delete-folder">削除</li>')
+                    .append('<li>プロパティ</li>')
+                )
+            )
+        );
+	    $(".buttons").css("display","none");
+	    $(".window").slideUp(300);
+	    $("#pageCover").hide(300);
+	    $(".added").delay(300).slideDown(500);
+    });
+}
+
+function deleteFolder(folderId){
+    var DataURL = "/folders/" + folderId + "/delete"; 
+    var obj = $(".folder[data-folder-id=" + folderId + "]");
+    obj.slideUp(500,function(){
+        $.ajax({
+            url: DataURL,
+            type: "POST",
+            contentType: false,
+            processData: false,
+            cache: true
+        }).done(function(){
+            obj.remove();
+        });
+    });
+}
+
 
 function setWindow(obj){
     $("#pageCover").css("display","block");
@@ -77,12 +168,39 @@ function setWindow(obj){
     obj.slideDown(300);
 }
 
+
 //definition end
+var frag = document.createElement("html");
+
+$(window).on("popstate",function(e){
+    //if(e.originalEvent.state == "forward"){
+    //    console.log("");
+    //}else{
+        $.ajax({
+            data:"GET",
+            url:document.referrer,
+            dataType:"html"
+        }).done(function(content){
+            $(frag).html(content);
+            $("#container").html($(frag).find("#container"));
+            history.replaceState(null,null,document.referrer);
+        },function(){
+            $("title").remove();
+            $("meta").append($(frag).find("title"));
+            $(".buttons").css("display","none");
+        });
+    //}
+});
+
+console.log(window.history.state);
+
+if(window.history.state != "forward"){
+    history.pushState("forward",null,document.pathname);
+}
 
 
-
-$(function(){
-
+$(function(e){
+    
     $("#droppable").on({
         "dragenter": function(){$(this).addClass("bgcolor_gray_1");},
         "dragover": function(){$(this).addClass("bgcolor_gray_1");},
@@ -102,7 +220,7 @@ $(function(){
     
     var dragimage_folder = new Image();
     dragimage_folder.src = "/images/folder_cursor.png";
-    $(".folder").on({
+    $(document).on({
         "dragenter": function(e){
             e.stopPropagation();
             $(this).addClass("bgcolor_gray_3");
@@ -140,7 +258,7 @@ $(function(){
             var href = $("a",this).attr("href");
             location.href = href;
         }
-    });
+    },".folder");
     
     var dragimage_file = new Image();
     dragimage_file.src = "/images/file_cursor.png";
@@ -213,7 +331,7 @@ $(function(){
     });
     
     
-    $(".content").on({
+    $(document).on({
         "contextmenu": function(e){
             e.preventDefault();
             var clickLeft = e.pageX - 180;
@@ -230,8 +348,8 @@ $(function(){
         "click": function(){
             $('.menu span').removeClass('selected');
             $('.buttons').slideUp(100);
-        },    
-    });
+        },
+    },".content");
     
     $('body').click(function(){
         if (over_flg == false){
@@ -241,10 +359,10 @@ $(function(){
     });
     
     
-    $("#addFolderButton").click(function(){
-        setWindow($("#addFolderWindow"));
+    $("#new_folder_button").click(function(){
+        setWindow($("#new_folder"));
         setTimeout(function(){
-            $("input.addFolderInput").focus();
+            $("input.new-folder-input").focus();
         },400);
     });
     
@@ -256,6 +374,25 @@ $(function(){
         e.preventDefault();
         $("#moveFileWindow form").attr("action",location.pathname + "/files/" + $(this).data("fileId") +"/move_file");
         setWindow($("#moveFileWindow"));
+    });
+    
+    $(".delete-file").click(function(){
+        deleteFile($(this).data("fileId"));
+    });
+    $(document).on("click",".delete-file",function(){
+        deleteFile($(this).data("fileId"));
+    });
+    
+    $("#new_folder button").click(function(e){
+        e.preventDefault();
+        createFolder($("input.new-folder-input").val());
+    });
+    
+    $(".delete-folder").click(function(){
+        deleteFolder($(this).data("folderId"));
+    });
+    $(document).on("click",".delete-folder",function(){
+        deleteFolder($(this).data("folderId"));
     });
     
     $("#pageCover").click(function(){

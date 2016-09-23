@@ -54,6 +54,8 @@ class VirtualFolder < ActiveRecord::Base
          root_folder.save
          @@error == "file size is too large"
       end
+      
+      return file
    end
    
    def add_zip(zip,link)

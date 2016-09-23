@@ -215,10 +215,15 @@ a{
     position: relative;
     width: 100%;
     height: 50px;
+    margin: 0;
     padding: 0;
     cursor: pointer;
     table-layout: fixed;
     font-weight: 200;
+    border-bottom: solid 0.3px #ddd;
+}
+.content:first-of-type{
+    border-top: solid 0.3px #ddd;
 }
 .content:hover{
     background-color: rgba(0,0,0,0.1);
@@ -227,13 +232,14 @@ a{
     background-color: rgba(0,0,0,0.3);
 }
 
-.content td{
+.content>li{
     position: absolute;
     top: 12px;
+    list-style: none;
     user-select: none; 
--moz-user-select: none;
--webkit-user-select: none; 
--ms-user-select: none; 
+    -moz-user-select: none;
+    -webkit-user-select: none; 
+    -ms-user-select: none; 
 }
 .content .icon{
     width: 30px;
@@ -273,49 +279,49 @@ a{
 }
 
 
-td.menu span{
+li.menu span{
     display: none;
 }
 
 .buttons{
+    margin-top: 0;
     position: absolute;
     display: block;
     width: 100px;
     background-color: #fefefe;
     z-index: 9999;
-    border: solid 1px #eee;
+    border: solid 1px #ddd;
     padding: 0;
-    
 }
+
 .buttons li{
     position: relative;
     width: 100%;
     list-style: none;
-}
-.buttons li form{
-    margin: 0;
-}
-.buttons li form button{
-    display: block;
-    font-family: "Noto Sans Japanese", sans-serif;
+    text-align: center;
+    font-size: 12px;
+    padding-top: 9px;
     width: 100%;
-    height: 40px;
-    background: none;
+    height: 30px;
     border-style: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    border-bottom: 1px solid #ddd;
 }
-.buttons button:focus{
-    outline: none;
+.buttons li:hover{
+    background-color: rgba(0,0,0,0.05);
 }
-.buttons button:hover{
-    background-color: rgba(0,0,0,0.1);
-}
-.buttons button:first-of-type{
-    border-bottom: 1px solid #eee;
+.buttons li:last-of-type{
+    border: none;
 }
 
+.download-file a, .download-folder a{
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: #000;
+}
 
 
 
@@ -344,7 +350,7 @@ td.menu span{
     border: solid 1px #ccc;
 }
 
-.addFolderInput{
+.new-folder-input{
     width: 200px;
     height: 30px;
     margin-top: 5px;
@@ -439,4 +445,3 @@ td.menu span{
     color: #aaa;
     margin-top: 40px;
 }
-
