@@ -25,7 +25,6 @@ function sendFileToServer(formData,folderId){
         type: "POST",
         contentType: false,
         processData: false,
-        cache: true,
         data: formData,
         dataType: "json",
         beforeSend:function(){
@@ -75,7 +74,6 @@ function moveFile(fileId,folderId){
         type: "POST",
         contentType: false,
         processData: false,
-        cache: true,
         data: fd,
         beforeSend:function(){
 			$(".loading").removeClass("hide");
@@ -96,8 +94,7 @@ function deleteFile(fileId){
             url: DataURL,
             type: "POST",
             contentType: false,
-            processData: false,
-            cache: true
+            processData: false
         }).done(function(){
             obj.remove();
         });
@@ -113,10 +110,8 @@ function createFolder(folderName){
         type: "post",
         contentType: false,
         processData: false,
-        cache: true,
         data: fd
     }).done(function(data){
-        
         $("#folders").append(
             $('<ul class="folder content added" draggable="true" data-folder-id="'+data.id+'" style="display:none">')
             .append('<li class="icon"><img src="/images/folder.png"></li>')
@@ -146,8 +141,7 @@ function deleteFolder(folderId){
             url: DataURL,
             type: "POST",
             contentType: false,
-            processData: false,
-            cache: true
+            processData: false
         }).done(function(){
             obj.remove();
         });
@@ -174,7 +168,7 @@ var frag = document.createElement("html");
 
 $(window).on("popstate",function(e){
     //if(e.originalEvent.state == "forward"){
-    //    console.log("");
+      //  console.log("");
     //}else{
         $.ajax({
             data:"GET",
@@ -192,16 +186,21 @@ $(window).on("popstate",function(e){
     //}
 });
 
-console.log(window.history.state);
-
-if(window.history.state != "forward"){
-    history.pushState("forward",null,document.pathname);
+/*
+if(window.history.state == "forward"){
+    console.log("oh yeah");
 }
+*/
 
 
 $(function(e){
     
-    $("#droppable").on({
+    if(!e.originalEvent){
+        history.pushState("forward",null,document.pathname);
+    }
+    
+    
+    $(document).on({
         "dragenter": function(){$(this).addClass("bgcolor_gray_1");},
         "dragover": function(){$(this).addClass("bgcolor_gray_1");},
         "dragleave": function(){$(this).removeClass("bgcolor_gray_1");},
@@ -213,7 +212,7 @@ $(function(e){
             handleFileUpload(files);
             $(".content").removeClass("bgcolor_gray_1").removeClass("bgcolor_gray_3");
         }
-    });
+    },"#droppable");
     
     jQuery.event.props.push("dataTransfer");
     
@@ -236,7 +235,6 @@ $(function(e){
             e.preventDefault();
             e.stopPropagation();
             if(e.dataTransfer.getData("file_id")){
-                console.log(e.dataTransfer.getData("file_id"));
                 moveFile(e.dataTransfer.getData("file_id"),$(this).data("folderId"));
             }else{
                 var files = e.dataTransfer.files;
@@ -314,7 +312,7 @@ $(function(e){
     var over_flg = false;
     $(".buttons").css("display","none");
     
-    $(".menu span").click(function(){ 
+    $(document).on("click",".menu span",function(){ 
         if ($(this).attr("class") == "selected"){
             $(this).removeClass("selected").next("ul").slideUp(100);
         }else{
@@ -324,11 +322,14 @@ $(function(e){
         }
     });
     
-    $(".content,.menu span,.buttons").hover(function(){
-        over_flg = true;
-    },function(){
-        over_flg = false;
-    });
+    $(document).on({
+        "mouseenter":function(){
+            over_flg = true;
+        },
+        "mouseleave":function(){
+            over_flg = false;
+        }
+    },".content,.menu span,.buttons");
     
     
     $(document).on({
@@ -351,7 +352,7 @@ $(function(e){
         },
     },".content");
     
-    $('body').click(function(){
+    $(document).not(".content,.menu span,.buttons").on("click",function(){
         if (over_flg == false){
             $('.menu span').removeClass('selected');
             $('.buttons').slideUp(100);
@@ -359,18 +360,18 @@ $(function(e){
     });
     
     
-    $("#new_folder_button").click(function(){
+    $(document).on("click","#new_folder_button",function(){
         setWindow($("#new_folder"));
         setTimeout(function(){
             $("input.new-folder-input").focus();
         },400);
     });
     
-    $("#addFileButton").click(function(){
+    $(document).on("click","#addFileButton",function(){
         setWindow($("#addFileWindow"));
     });
     
-    $(".moveFileButton").click(function(e){
+    $(document).on("click",".moveFileButton",function(e){
         e.preventDefault();
         $("#moveFileWindow form").attr("action",location.pathname + "/files/" + $(this).data("fileId") +"/move_file");
         setWindow($("#moveFileWindow"));
@@ -383,7 +384,7 @@ $(function(e){
         deleteFile($(this).data("fileId"));
     });
     
-    $("#new_folder button").click(function(e){
+    $(document).on("click","#new_folder button",function(e){
         e.preventDefault();
         createFolder($("input.new-folder-input").val());
     });
@@ -395,13 +396,13 @@ $(function(e){
         deleteFolder($(this).data("folderId"));
     });
     
-    $("#pageCover").click(function(){
+    $(document).on("click","#pageCover",function(){
         $(".window").css("display","none");
         $(this).css("display","none");
     });
     
     
-    $("button.delete").on("click",function(e){
+    $(document).on("click","button.delete",function(e){
         if(!confirm("本当に削除しますか？")){
             return false;
         }else{
@@ -412,11 +413,11 @@ $(function(e){
     
     
     //development
-    $("#parentFolder span").click(function(e){
+    $(document).on("click","#parentFolder span",function(e){
         e.stopPropagation();
         $("#parentFolder .buttons").slideToggle(100);
     });
-    $("#parentFolder button").click(function(e){
+    $(document).on("click","#parentFolder button",function(e){
         e.preventDefault();
         window.location.href = "/folders/" + $(this).data("parentId");
     });
