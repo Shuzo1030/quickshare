@@ -6,9 +6,6 @@
     <link rel="stylesheet" href="form_page.css">
 </head>
 <body>
-    <header id="header">
-        <>
-    </header>
     <div id="container">
         <div id="header">
             <a href="/"><div id="logo">Quickshare</div></a>
@@ -49,6 +46,8 @@
             <input type="password" name="password_confirmation" required><br>
             <span>有効期間：</span>
             <input type="date" name="date" min="<%= @today.to_s %>" max="<%= @expire_limit.to_s %>" required><br>
+            <span>admin_pass(if you need)：</span>
+            <input type="password" name="admin_pass">
             <div class="submit" id="access_submit">
                 <button type="submit">フォームを送信</button>
                 <div class="bdB_1"></div><div class="bdB_2"></div>

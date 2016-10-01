@@ -8,10 +8,10 @@ require "fileutils"
 require "securerandom"
 require "zip"
 require "date"
+require "digest/sha2"
 require "./models"
 
 enable :sessions
-
 
 @@error = ""
 
@@ -43,6 +43,14 @@ post "/create_folder" do
     end
     
     if folder.valid?
+        if params[:admin_pass] == params[:password]
+            @@error = ""
+            redirect "/create"
+        elsif !(params[:admin_pass].empty?)
+           folder.admin_pass = params[:admin_pass]
+           folder.admin_pass_digest = Digest::SHA2.hexdigest("#{params[:admin_pass]}")
+        end
+        session[:admin] = true;
         folder.root_id = folder.id
         folder.save
         session[:folder] = folder.id
@@ -74,15 +82,14 @@ post "/folders/:id/create_folder" do
         )
     end
     
-    p new_folder
-    
-    form_data={
+    if session[:admin]
+        form_data = {
         id: new_folder.id,
         name: new_folder.name
-    }
-    
-    p form_data
-    
+        }
+    else
+        form_data = nil
+    end
     json form_data
 end
 
@@ -93,18 +100,29 @@ end
 
 post "/access_folder" do
     folder = VirtualFolder.find_by(name: params[:name])
-    if folder && folder.authenticate(params[:password])
+    if folder && folder.admin?
+        auth = !(params[:password].empty?) && folder.admin_pass_digest == Digest::SHA2.hexdigest("#{params[:password]}")
+    else
+        auth = folder.authenticate(params[:password]) 
+    end
+    
+    if auth
+        session[:admin] = true
         session[:folder] = folder.id
         redirect "/folders/#{folder.id}"
     else
+        session[:admin] = false
         @@error = "authenticate error"
         redirect "/access"
     end
 end
 
 get "/folders/:id" do
+    @admin = false 
     folder_id = params[:id].to_i
-    if VirtualFolder.find(folder_id).root_id != session[:folder]
+    if session[:admin]
+        @admin = true
+    elsif VirtualFolder.find(folder_id).root_id != session[:folder]
         @@error = "not authenticated"
         redirect "/access"
     end
@@ -125,18 +143,22 @@ post "/folders/:id/upload_file" do
     folder = VirtualFolder.find(params[:id].to_i)
     form_data = {}
     form_data[:data] = []
-    params[:files].each_with_index do |file,i|
-        upload_file = folder.upload(file)
-        form_data[:data].push({
-            id: upload_file.id,
-            name: upload_file.name.gsub!(/\..*/,""),
-            filetype: upload_file.filetype.delete(".").upcase,
-            size: File.size("./public/uploaded/#{upload_file.link}#{upload_file.filetype}"),
-            created_at: (upload_file.created_at+9.hour).to_s.delete!("UTC").gsub(/\-/,"/"),
-            img_existence: File.exists?("./public/images/file_icons/#{(upload_file.filetype).delete(".")}.png"),
-            img_filetype: upload_file.filetype.delete("."),
-            parent_id: upload_file.virtual_folder.id
-        })
+    if session[:admin]
+        params[:files].each_with_index do |file,i|
+            upload_file = folder.upload(file)
+            form_data[:data].push({
+                id: upload_file.id,
+                name: upload_file.name.gsub!(/\..*/,""),
+                filetype: upload_file.filetype.delete(".").upcase,
+                size: File.size("./public/uploaded/#{upload_file.link}#{upload_file.filetype}"),
+                created_at: (upload_file.created_at+9.hour).to_s.delete!("UTC").gsub(/\-/,"/"),
+                img_existence: File.exists?("./public/images/file_icons/#{(upload_file.filetype).delete(".")}.png"),
+                img_filetype: upload_file.filetype.delete("."),
+                parent_id: upload_file.virtual_folder.id
+            })
+        end
+    else
+        form_data = nil    
     end
     
     json form_data
@@ -189,16 +211,16 @@ end
 
 
 #admin
-get "/admin" do
+get "/master" do
     p session[:master]
     if session[:master]
-        erb :admin
+        erb :master
     else
-        erb :admin_gate
+        erb :master_gate
     end
 end
 
-post "/admin" do
+post "/master" do
     if params[:password] == "qwerty"
        session[:master] = true
     else
@@ -213,7 +235,7 @@ get "/clean_up" do
     f.each do |f|
         f.destroy
     end    
-    redirect "/admin"
+    redirect "/master"
 end
 
 #404

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160708111021) do
+ActiveRecord::Schema.define(version: 20160930112852) do
 
   create_table "virtual_files", force: :cascade do |t|
     t.string   "name"
@@ -33,6 +33,8 @@ ActiveRecord::Schema.define(version: 20160708111021) do
     t.boolean  "parent",            default: false
     t.date     "expire"
     t.integer  "root_id"
+    t.string   "admin_pass"
+    t.string   "admin_pass_digest"
   end
 
 end

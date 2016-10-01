@@ -22,6 +22,10 @@ class VirtualFolder < ActiveRecord::Base
       return  id == root_id
    end
    
+   def admin?
+      return !(admin_pass.nil?)
+   end
+   
    def upload(file)
       root_folder = VirtualFolder.find(self.root_id)
       tempfile = file[:tempfile]

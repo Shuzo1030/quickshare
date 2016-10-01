@@ -1,18 +1,11 @@
 //function definition
 
-function handleFileUpload(files,folderId){
-    for(var i=0; i<files.length; i++){
-        var fd = new FormData();
-        fd.append("files[]",files[i]);
-        if(folderId){
-          sendFileToServer(fd,folderId);  
-        }else{
-          sendFileToServer(fd);
-        }
+function uploadFile(uploadedFiles,folderId){
+    
+    var formData = new FormData();
+    for(var i=0; i<uploadedFiles.length; i++){
+        formData.append("files[]",uploadedFiles[i]);
     }
-}
-
-function sendFileToServer(formData,folderId){
     
     if(folderId){
         var DataURL = "/folders/" + folderId + "/upload_file";
@@ -29,38 +22,41 @@ function sendFileToServer(formData,folderId){
         dataType: "json",
         beforeSend:function(){
 			$(".loading").removeClass("hide");
-		},
-        success: function(fileData){
-			$(".loading").addClass("hide");
-			if(folderId){
-			    window.location.href = "/folders/" + folderId;
-			}else{
-			    var i,files=fileData.data;
-			    for(i=0;i<files.length;i++){
-			        $("#droppable").append(
-			            $('<ul class="file content added" draggable="true" data-file-id="'+files[i].id+'" style="display:none">')
-			            .append('<li class="icon"><img src="'+
-			                    (files[i].img_existence ? '/images/file_icons/'+files[i].img_filetype+'.png' : '/images/file_icons/others.png')
-			                    +'"></li>')
-			            .append('<li class="name">'+files[i].name+'</li>')
-			            .append('<li class="type">'+files[i].filetype+'</li>')
-			            .append('<li class="size">'+files[i].size+'</li>')
-			            .append('<li class="created_at">'+files[i].created_at+'</li>')
-			            .append($('<li class="menu">')
-			                    .append('<span></span>')
-			                    .append($('<ul class="buttons">')
-			                            .append('<li class="download-file"><a href="'+location.pathname+'/files/'+files[i].id+'/download">ダウンロード</a></li>')
-			                            .append('<li data-file-id="'+files[i].id+'"class="move-file">移動</li>')
-			                            .append('<li data-file-id="'+files[i].id+'"class="delete-file">削除</li>')
-			                            .append('<li>プロパティ</li>')
-			                            )
-			                    )
-			        );
-			    }
-			    $(".buttons").css("display","none");
-			    $(".added").slideDown(500);
-			}
+		}
+	}).done(function(fileData){
+        $(".loading").addClass("hide");
+        if(fileData == null){
+            alert("Forbidden Action:ファイルのアップロードは管理者のみ可能です。");
+            return false;
         }
+		if(folderId){
+		    window.location.href = "/folders/" + folderId;
+		}else{
+		    var i,files=fileData.data;
+		    for(i=0;i<files.length;i++){
+		        $("#droppable").append(
+		            $('<ul class="file content added" draggable="true" data-file-id="'+files[i].id+'" style="display:none">')
+		            .append('<li class="icon"><img src="'+
+		                    (files[i].img_existence ? '/images/file_icons/'+files[i].img_filetype+'.png' : '/images/file_icons/others.png')
+		                    +'"></li>')
+		            .append('<li class="name">'+files[i].name+'</li>')
+		            .append('<li class="type">'+files[i].filetype+'</li>')
+		            .append('<li class="size">'+files[i].size+'</li>')
+		            .append('<li class="created_at">'+files[i].created_at+'</li>')
+		            .append($('<li class="menu">')
+		                    .append('<span></span>')
+		                    .append($('<ul class="buttons">')
+		                            .append('<li class="download-file"><a href="'+location.pathname+'/files/'+files[i].id+'/download">ダウンロード</a></li>')
+		                            .append('<li data-file-id="'+files[i].id+'"class="move-file">移動</li>')
+		                            .append('<li data-file-id="'+files[i].id+'"class="delete-file">削除</li>')
+		                            .append('<li>プロパティ</li>')
+		                            )
+		                    )
+		        );
+		    }
+		    $(".buttons").css("display","none");
+		    $(".added").slideDown(500);
+	    }
     });
 }
 
@@ -77,11 +73,10 @@ function moveFile(fileId,folderId){
         data: fd,
         beforeSend:function(){
 			$(".loading").removeClass("hide");
-		},
-        success: function(data){
-			$(".loading").addClass("hide");
-			window.location.href = "/folders/" + folderId;
-        }
+		}
+    }).done(function(data){
+		$(".loading").addClass("hide");
+		window.location.href = "/folders/" + folderId;
     });
 }
 
@@ -209,7 +204,7 @@ $(function(e){
             e.stopPropagation();
             $(this).removeClass("bgcolor_gray_1");
             var files = e.originalEvent.dataTransfer.files;
-            handleFileUpload(files);
+            uploadFile(files,null);
             $(".content").removeClass("bgcolor_gray_1").removeClass("bgcolor_gray_3");
         }
     },"#droppable");
@@ -238,7 +233,7 @@ $(function(e){
                 moveFile(e.dataTransfer.getData("file_id"),$(this).data("folderId"));
             }else{
                 var files = e.dataTransfer.files;
-                handleFileUpload(files,$(this).data("folderId"));
+                uploadFile(files,$(this).data("folderId"));
             }
             $(this).removeClass("bgcolor_gray_3");
             $("#droppable").removeClass("bgcolor_gray_1");

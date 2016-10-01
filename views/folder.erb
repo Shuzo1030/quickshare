@@ -11,7 +11,13 @@
 </head>
 <body>
     <% base_url = "/folders/#{@folder.id}" %>
-    <div id="container">
+    <div id="container" style="background-color:
+        <% if @admin %>
+            Linen
+        <% else %>
+            #fafafa
+        <% end %>
+    ">
         <header id="header">
             <div id="header">
                 <a href="/"><div id="logo">Quickshare</div></a>
