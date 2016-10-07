@@ -90,4 +90,12 @@ end
 class VirtualFile < ActiveRecord::Base
    belongs_to :virtual_folder
    validates :link, uniqueness: true
+   
+   def delete_file(parent_folder)
+      filepath = "./public/uploaded/#{link}#{filetype}"
+      parent_folder.size -= File.size(filepath)
+      parent_folder.save
+      File.unlink(filepath)
+      self.destroy
+   end
 end

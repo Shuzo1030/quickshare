@@ -128,19 +128,36 @@ function createFolder(folderName){
     });
 }
 
-function deleteFolder(folderId){
-    var DataURL = "/folders/" + folderId + "/delete"; 
-    var obj = $(".folder[data-folder-id=" + folderId + "]");
-    obj.slideUp(500,function(){
+function deleteFolder(folderId,linkSwitch){
+    var DataURL = "/folders/" + folderId + "/delete";
+    console.log(linkSwitch);
+    if (linkSwitch){
         $.ajax({
             url: DataURL,
             type: "POST",
+            dataType: "json",
             contentType: false,
             processData: false
-        }).done(function(){
-            obj.remove();
+        }).done(function(formData){
+            if(formData.data.root){
+                location.href = "/";
+            } else {
+                location.href = "/folders/" + formData.data.parentId
+            }
         });
-    });
+    } else {
+        var obj = $(".folder[data-folder-id=" + folderId + "]");
+        obj.slideUp(500,function(){
+            $.ajax({
+                url: DataURL,
+                type: "POST",
+                contentType: false,
+                processData: false
+            }).done(function(){
+                obj.remove();
+            });
+        });
+    }
 }
 
 
@@ -372,9 +389,6 @@ $(function(e){
         setWindow($("#moveFileWindow"));
     });
     
-    $(".delete-file").click(function(){
-        deleteFile($(this).data("fileId"));
-    });
     $(document).on("click",".delete-file",function(){
         deleteFile($(this).data("fileId"));
     });
@@ -384,11 +398,13 @@ $(function(e){
         createFolder($("input.new-folder-input").val());
     });
     
-    $(".delete-folder").click(function(){
-        deleteFolder($(this).data("folderId"));
-    });
     $(document).on("click",".delete-folder",function(){
-        deleteFolder($(this).data("folderId"));
+        if($(this).attr("id") == "link_switch"){
+            var linkSwitch = true;
+        }else{
+            var linkSwitch = false;
+        }
+        deleteFolder($(this).data("folderId"),linkSwitch);
     });
     
     $(document).on("click","#pageCover",function(){

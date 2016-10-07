@@ -43,6 +43,10 @@
             <% @@error = "" %>
         <% end %>
         
+        <% if @admin %>
+            <p>管理用モード</p>
+        <% end %>
+        
         <div id="directory">
             <div id="directoryProperty">
                 <% unless @folder.root? %>
@@ -69,22 +73,24 @@
                         <img src="/images/gear.png">
                         <span class="hover"></span>
                     <ul class="buttons dirFormButton">
-                        <li><form action="<%= base_url %>/delete" method="post"><button type="submit" class="delete">削除</button></form></li>
-                        <li><form><button>プロパティ</button></form></li>
+                        <li data-folder-id="<%= @folder.id %>" class="delete-folder" id="link_switch">削除</li>
+                        <li>プロパティ</li>
                     </ul>
                 </div>
                 
             </div>
             
-            <div id="addFileButton" class="addButton">
-                <img src="/images/file_upload.png">
-                <span class="hover2"></span>
-            </div>
-            
-            <div id="new_folder_button" class="addButton">
-                <img src="/images/addFolder.png">
-                <span class="hover2"></span>
-            </div>
+            <% if @admin %>
+                <div id="addFileButton" class="addButton">
+                    <img src="/images/file_upload.png">
+                    <span class="hover2"></span>
+                </div>
+                
+                <div id="new_folder_button" class="addButton">
+                    <img src="/images/addFolder.png">
+                    <span class="hover2"></span>
+                </div>
+            <% end %>
 
             <div id="droppable">
                 <% if @children == nil && @files == nil %>
@@ -99,8 +105,10 @@
                                 <span></span>
                                 <ul class="buttons">
                                     <li class="download-folder"><a href="/folders/<%= folder.id %>/download">ダウンロード</a></li>
-                                    <li data-folder-id="<%= folder.id %>" class="move-folder">移動</li>
-                                    <li data-folder-id="<%= folder.id %>" class="delete-folder">削除</li>
+                                    <% if @admin %>
+                                        <li data-folder-id="<%= folder.id %>" class="move-folder">移動</li>
+                                        <li data-folder-id="<%= folder.id %>" class="delete-folder">削除</li>
+                                    <% end %>
                                     <li>プロパティ</li>
                                 </ul>
                             </li>
@@ -125,8 +133,10 @@
                                     <span></span>
                                     <ul class="buttons">
                                         <li class="download-file"><a href="<%= base_url %>/files/<%= file.id %>/download">ダウンロード</a></li>
-                                        <li data-file-id="<%= file.id %>" class="move-file">移動</li>
-                                        <li data-file-id="<%= file.id %>" class="delete-file">削除</li>
+                                        <% if @admin %>
+                                            <li data-file-id="<%= file.id %>" class="move-file">移動</li>
+                                            <li data-file-id="<%= file.id %>" class="delete-file">削除</li>
+                                        <% end %>
                                         <li>プロパティ</li>
                                     </ul>
                             </li>

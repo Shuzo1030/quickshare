@@ -291,6 +291,7 @@ li.menu span{
     z-index: 9999;
     border: solid 1px #ddd;
     padding: 0;
+    cursor: pointer;
 }
 
 .buttons li{

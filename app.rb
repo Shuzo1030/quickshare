@@ -83,12 +83,17 @@ post "/folders/:id/create_folder" do
     end
     
     if session[:admin]
+        if folder.admin?
+            new_folder.admin_pass = "child_admin"
+            new_folder.save
+        end
         form_data = {
         id: new_folder.id,
         name: new_folder.name
         }
     else
         form_data = nil
+        new_folder.destroy
     end
     json form_data
 end
@@ -100,13 +105,22 @@ end
 
 post "/access_folder" do
     folder = VirtualFolder.find_by(name: params[:name])
-    if folder && folder.admin?
-        auth = !(params[:password].empty?) && folder.admin_pass_digest == Digest::SHA2.hexdigest("#{params[:password]}")
-    else
-        auth = folder.authenticate(params[:password]) 
-    end
     
-    if auth
+    if folder && folder.admin?
+        if !(params[:password].empty?) && folder.admin_pass_digest == Digest::SHA2.hexdigest("#{params[:password]}")
+            session[:admin] = true
+            session[:folder] = folder.id
+            redirect "/folders/#{folder.id}"    
+        elsif folder && folder.authenticate(params[:password]) 
+            session[:admin] = false
+            session[:folder] = folder.id
+            redirect "/folders/#{folder.id}"
+        else
+            session[:admin] = false
+            @@error = "authenticate error"
+            redirect "/access"
+        end
+    elsif folder && folder.authenticate(params[:password])
         session[:admin] = true
         session[:folder] = folder.id
         redirect "/folders/#{folder.id}"
@@ -118,16 +132,18 @@ post "/access_folder" do
 end
 
 get "/folders/:id" do
-    @admin = false 
+    @admin = false
     folder_id = params[:id].to_i
-    if session[:admin]
+    @folder = VirtualFolder.find(folder_id)
+    
+    if @folder.admin? && session[:admin]
         @admin = true
-    elsif VirtualFolder.find(folder_id).root_id != session[:folder]
+    elsif @folder.root_id != session[:folder]
         @@error = "not authenticated"
+        @folder = nil
         redirect "/access"
     end
     
-    @folder = VirtualFolder.find(folder_id)
     if @folder.expire < Date.today
         redirect "/not_found"
     end
@@ -183,34 +199,41 @@ end
 
 #delete
 post "/folders/:id/delete" do
-    folder = VirtualFolder.find(params[:id].to_i)
-    parent = folder.parent
-    root = folder.root?
-    folder.delete_folder
+    if session[:admin]
+        folder = VirtualFolder.find(params[:id].to_i)
+        formData = {}
+        formData[:data] = []
+        formData[:data].push({
+            root: folder.root?,
+            parentId: folder.parent.id
+        })
+        folder.delete_folder
+    else
+        formData = nil
+    end
+    json formData
 end
 
 post "/folders/:folder_id/files/:file_id/delete" do
-    file = VirtualFile.find(params[:file_id].to_i)
-    parent_folder = VirtualFolder.find(VirtualFolder.find(params[:folder_id]).root_id)
-    
-    filepath = "./public/uploaded/#{file.link}#{file.filetype}"
-    parent_folder.size -= File.size(filepath)
-    parent_folder.save
-    File.unlink(filepath)
-    file.destroy
+    if session[:admin]
+        file = VirtualFile.find(params[:file_id].to_i)
+        parent_folder = VirtualFolder.find(VirtualFolder.find(params[:folder_id]).root_id)
+        file.delete_file(parent_folder)
+        p "deleted"
+    end
 end
 
-#developing stage
 post "/folders/:folder_id/files/:file_id/move_file" do
-    file = VirtualFile.find(params[:file_id].to_i)
-    file.virtual_folder_id = params[:folder].to_i
-    file.save
-    
+    if session[:admin]
+        file = VirtualFile.find(params[:file_id].to_i)
+        file.virtual_folder_id = params[:folder].to_i
+        file.save
+    end
     redirect "/folders/#{params[:folder].to_i}"
 end
 
 
-#admin
+#master
 get "/master" do
     p session[:master]
     if session[:master]
